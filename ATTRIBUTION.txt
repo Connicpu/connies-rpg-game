@@ -1,0 +1,9 @@
+Libraries
+---------
+
+Amethyst Game Engine (https://www.amethyst.rs/), MIT license
+
+
+Fonts
+-----
+Carlito by Lukasz Dziedzic, http://scripts.sil.org/OFL

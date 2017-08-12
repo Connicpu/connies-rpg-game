@@ -1,0 +1,13 @@
+[package]
+authors = ["Connie Hilarides <conni_h@outlook.com>"]
+name = "connies-rpg-game"
+version = "0.1.0"
+
+[dependencies]
+ggez = "0.3.3"
+shred = "0.4.3"
+shred-derive = "0.3.0"
+specs = "0.9.3"
+specs-derive = "0.1.0"
+tiled = "0.7.0"
+wrapped2d = "0.3.4"
