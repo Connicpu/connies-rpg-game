@@ -1,4 +1,4 @@
-use specs::{System, FetchMut, Fetch, Entity};
+use specs::{System, FetchMut, Fetch};
 use physics::World;
 use timer::Timer;
 
@@ -14,8 +14,8 @@ impl<'a> System<'a> for PhysicsRun {
     type SystemData = Data<'a>;
 
     fn run(&mut self, mut data: Data) {
-        let mut world = data.world.lock.lock().unwrap();
+        let world = data.world.access();
 
-        world.step(1.0 / 60.0, 8, 3);
+        world.step(data.timer.delta_time, 8, 3);
     }
 }
