@@ -1,4 +1,5 @@
-use specs::{FetchMut, System};
+use ecs::system::{System, Process};
+
 use time;
 
 #[derive(Debug)]
@@ -42,17 +43,21 @@ impl Timer {
     }
 }
 
-pub struct UpdateTime;
-
-#[derive(SystemData)]
-pub struct Data<'a> {
-    pub timer: FetchMut<'a, Timer>,
+impl Default for Timer {
+    fn default() -> Self {
+        Timer::new()
+    }
 }
 
-impl<'a> System<'a> for UpdateTime {
-    type SystemData = Data<'a>;
+pub struct UpdateTime;
 
-    fn run(&mut self, mut data: Data) {
-        data.timer.update();
+impl System for UpdateTime {
+    type Components = ::Components;
+    type Services = ::Services;
+}
+
+impl Process for UpdateTime {
+    fn process(&mut self, data: &mut ::DataHelper) {
+        data.services.timer.update();
     }
 }

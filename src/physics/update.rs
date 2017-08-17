@@ -1,29 +1,24 @@
-use specs::{System, FetchMut, Fetch, ReadStorage, WriteStorage, Join};
-use physics::{World, Body};
-use components::Transform;
+use ecs::system::{System, EntityProcess};
+use ecs::EntityIter;
 
 pub struct PhysicsUpdate;
 
-#[derive(SystemData)]
-pub struct Data<'a> {
-    world: FetchMut<'a, World>,
-    body: ReadStorage<'a, Body>,
-    transform: WriteStorage<'a, Transform>,
+impl System for PhysicsUpdate {
+    type Components = ::Components;
+    type Services = ::Services;
 }
 
-impl<'a> System<'a> for PhysicsUpdate {
-    type SystemData = Data<'a>;
-
-    fn run(&mut self, mut data: Data) {
-        let world = data.world.access();
-
-        for (transform, body) in (&mut data.transform, &data.body).join() {
-            let body = world.body(body.handle);
+impl EntityProcess for PhysicsUpdate {
+    fn process<'a>(&mut self, entities: EntityIter<'a, ::Components>, data: &mut ::DataHelper) {
+        for entity in entities {
+            let body_handle = data.components.body[entity].handle;
+            let body = data.services.physics.world.body(body_handle);
             let body_pos = body.transform();
+
+            let transform = &mut data.components.transform[entity];
             transform.pos.x = body_pos.pos.x;
-            transform.pos.x = body_pos.pos.y;
+            transform.pos.y = body_pos.pos.y;
             transform.rot = body_pos.rot.angle();
         }
     }
 }
-

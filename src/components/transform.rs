@@ -1,8 +1,6 @@
-use specs::VecStorage;
 use cgmath::Vector2;
 
-#[derive(Component, Copy, Clone)]
-#[component(VecStorage)]
+#[derive(Copy, Clone)]
 pub struct Transform {
     pub pos: Vector2<f32>,
     pub rot: f32,
