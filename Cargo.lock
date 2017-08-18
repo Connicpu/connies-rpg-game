@@ -975,12 +975,17 @@ dependencies = [
 [[package]]
 name = "tiled"
 version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "base64 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "flate2 0.2.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "xml-rs 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "tiled"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+replace = "tiled 0.7.0"
 
 [[package]]
 name = "time"
