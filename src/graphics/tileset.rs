@@ -1,5 +1,5 @@
 use glium::texture::{MipmapsOption, Texture1d, UncompressedFloatFormat};
-use tiled::{self, Tileset};
+use tiled::Tileset;
 
 use graphics::{self, TextureId};
 

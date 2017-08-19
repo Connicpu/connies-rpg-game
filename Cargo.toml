@@ -16,6 +16,3 @@ time = "0.1.38"
 windows_dpi = "0.1.4"
 winit = "0.7.5"
 wrapped2d = "0.3.4"
-
-[replace]
-"tiled:0.7.0" = { path = "../rs-tiled" }

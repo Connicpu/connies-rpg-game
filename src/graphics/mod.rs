@@ -9,6 +9,8 @@ use glium::texture::SrgbTexture2d;
 use glium::framebuffer::SimpleFrameBuffer;
 use glium::uniforms::MagnifySamplerFilter;
 
+use std::collections::VecDeque;
+
 use graphics::quad_types::{QUAD_INDICES, QUAD_VERTICES};
 use graphics::tileset::{TileInstance, TilesetDesc};
 
@@ -30,7 +32,7 @@ pub struct System {
     quad_indices: glium::IndexBuffer<u32>,
     sprite_shader: glium::Program,
     tile_shader: glium::Program,
-    tile_buffer: VertexBuffer<TileInstance>,
+    tile_buffers: VecDeque<VertexBuffer<TileInstance>>,
 
     fxaa_shader: glium::Program,
     fxaa_buffer: Option<SrgbTexture2d>,
@@ -59,8 +61,7 @@ impl System {
         let quad_indices = IndexBuffer::new(&display, TrianglesList, &QUAD_INDICES[..]).unwrap();
         let sprite_shader = shaders::load_sprite_shader(&display);
         let tile_shader = shaders::load_tile_shader(&display);
-        let tile_buffer = VertexBuffer::empty_persistent(&display, 64)
-            .unwrap_or_else(|_| VertexBuffer::empty_dynamic(&display, 64).unwrap());
+        let tile_buffers = (0..16).map(|_| Self::make_tile_buffer(&display)).collect();
 
         let fxaa_shader = shaders::load_fxaa_shader(&display);
 
@@ -74,7 +75,7 @@ impl System {
             quad_indices,
             sprite_shader,
             tile_shader,
-            tile_buffer,
+            tile_buffers,
 
             fxaa_shader,
             fxaa_buffer: None,
@@ -133,8 +134,10 @@ impl System {
     ) where
         S: glium::Surface,
     {
+        let tile_buffer = self.tile_buffers.pop_front().unwrap();
+
         let tile_data = unsafe { &*(tiles as *const [u16] as *const [TileInstance]) };
-        self.tile_buffer.write(tile_data);
+        tile_buffer.write(tile_data);
 
         let tex = self.textures.get(tileset.texture);
         let tex_sampler = tex.tex
@@ -143,11 +146,10 @@ impl System {
             .minify_filter(glium::uniforms::MinifySamplerFilter::Linear);
 
         let tileset_sampler = tileset.tile_uv.sampled();
-        let instanced = self.tile_buffer.per_instance().unwrap();
 
         surface
             .draw(
-                (&self.quad_vertices, instanced),
+                (&self.quad_vertices, tile_buffer.per_instance().unwrap()),
                 &self.quad_indices,
                 &self.tile_shader,
                 &uniform! {
@@ -169,6 +171,8 @@ impl System {
                 },
             )
             .expect("draw shouldn't fail");
+
+        self.tile_buffers.push_back(tile_buffer);
     }
 
     pub fn fxaa<S>(&mut self, surface: &mut S)
@@ -214,6 +218,11 @@ impl System {
 
     fn bind_fxaa_buffer(&self) -> SimpleFrameBuffer {
         SimpleFrameBuffer::new(&self.display, self.fxaa_color_buffer()).unwrap()
+    }
+
+    fn make_tile_buffer(display: &glium::Display) -> VertexBuffer<TileInstance> {
+        VertexBuffer::empty_persistent(display, 64)
+            .unwrap_or_else(|_| VertexBuffer::empty_dynamic(display, 64).unwrap())
     }
 }
 
