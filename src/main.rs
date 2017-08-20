@@ -18,16 +18,26 @@ extern crate winit;
 #[macro_use]
 extern crate ecs;
 
+#[macro_use]
+extern crate serde_derive;
+extern crate serde;
+extern crate toml;
+
+#[macro_use]
+extern crate lazy_static;
+
 use ecs::system::EntitySystem;
 
 use std::path::Path;
+use std::fs::File;
+use std::io::Read;
 
 pub mod components;
+pub mod config;
 pub mod graphics;
 pub mod input;
 pub mod physics;
 pub mod timer;
-
 pub mod util;
 
 impl ecs::ServiceManager for Services {}
@@ -45,8 +55,17 @@ pub struct Services {
 
 pub type DataHelper = ecs::DataHelper<Components, Services>;
 
+lazy_static! {
+    pub static ref CONFIG: config::Config = {
+        let mut config_data = vec![];
+        File::open("resources/config/config.toml").unwrap().read_to_end(&mut config_data).unwrap();
+        toml::from_slice(&config_data).unwrap()
+    };
+}
+
 fn main() {
     util::panic_handler::init();
+
 
     let mut world = ecs::World::<Systems>::with_services(Services::default());
 
@@ -116,12 +135,11 @@ fn main() {
 
             world.data.services.graphics.draw_tiles(&mut frame, &camera, [0.0, 0.0, 0.5], &tiles, &tileset);
             world.data.services.graphics.draw_tiles(&mut frame, &camera, [9.0, 0.0, 0.5], &tiles, &tileset);
-
-            if !world.data.services.keyboard.is_held(winit::VirtualKeyCode::F) {
-                world.data.services.graphics.fxaa(&mut frame);
-            }
+            world.data.services.graphics.fxaa(&mut frame);
 
             frame.finish().unwrap();
+
+            process!(world, end_frame);
         }
     }
 }
@@ -145,6 +163,7 @@ systems! {
         passive: {
             update_time: timer::UpdateTime = timer::UpdateTime,
             update_input: input::UpdateInput = input::UpdateInput,
+            end_frame: graphics::EndFrame = graphics::EndFrame,
         }
     }
 }

@@ -8,7 +8,6 @@ pub struct Timer {
     pub running_time: f64,
 
     pub start_time: u64,
-    pub prev_time: u64,
     pub time: u64,
     pub delta_time_ns: u64,
 }
@@ -21,7 +20,6 @@ impl Timer {
             delta_time: 0.0,
             running_time: 0.0,
             start_time: now,
-            prev_time: now,
             time: now,
             delta_time_ns: 0,
         }
@@ -38,8 +36,13 @@ impl Timer {
         self.running_time = running_time as f64 / 1.0e9;
 
         self.delta_time_ns = diff_time;
-        self.prev_time = self.time;
         self.time = now;
+    }
+
+    pub fn immediate_frametime_ns(&self) -> u64 {
+        let now = time::precise_time_ns();
+
+        now - self.time
     }
 }
 

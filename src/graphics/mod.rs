@@ -13,10 +13,13 @@ use std::collections::VecDeque;
 
 use graphics::quad_types::{QUAD_INDICES, QUAD_VERTICES};
 use graphics::tileset::{TileInstance, TilesetDesc};
+use CONFIG;
 
 pub use graphics::quad_types::{Camera, QuadVertex, SpriteInstance};
 pub use graphics::textures::TextureId;
+pub use graphics::end_frame::EndFrame;
 
+pub mod end_frame;
 pub mod quad_types;
 pub mod shaders;
 pub mod textures;
@@ -44,12 +47,16 @@ impl System {
         let dpi = windows_dpi::desktop_dpi();
 
         let events_loop = winit::EventsLoop::new();
-        let window_builder = winit::WindowBuilder::new()
-            //.with_fullscreen(winit::get_primary_monitor())
+        let mut window_builder = winit::WindowBuilder::new()
             .with_dimensions((800.0 * dpi) as u32, (600.0 * dpi) as u32)
             .with_title("Connie's RPG Game");
+
+        if CONFIG.graphics.fullscreen {
+            window_builder = window_builder.with_fullscreen(winit::get_primary_monitor());
+        }
+
         let gl_builder = glutin::ContextBuilder::new()
-            .with_vsync(true)
+            .with_vsync(CONFIG.graphics.vsync)
             .with_depth_buffer(24)
             .with_srgb(true);
         let display = glium::Display::new(window_builder, gl_builder, &events_loop)
