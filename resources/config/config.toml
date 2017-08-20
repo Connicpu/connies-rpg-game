@@ -1,5 +1,5 @@
 [graphics]
 fullscreen = false
 vsync = false
-max_fps = 60
+max_fps = 144
 
