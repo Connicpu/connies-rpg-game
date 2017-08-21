@@ -19,9 +19,11 @@ implement_vertex!(SpriteInstance, center, scale, rot, uv_rect, world_pos);
 
 #[derive(Copy, Clone)]
 pub struct Camera {
-    pub view: [[f32; 3]; 3],
     pub proj: [[f32; 4]; 4],
+    pub view: [[f32; 4]; 4],
 }
+
+implement_uniform_block!(Camera, proj, view);
 
 pub static QUAD_VERTICES: [QuadVertex; 4] = [
     QuadVertex {
@@ -42,7 +44,4 @@ pub static QUAD_VERTICES: [QuadVertex; 4] = [
     },
 ];
 
-pub static QUAD_INDICES: [u32; 6] = [
-    0, 2, 1,
-    1, 2, 3,
-];
+pub static QUAD_INDICES: [u32; 6] = [0, 2, 1, 1, 2, 3];

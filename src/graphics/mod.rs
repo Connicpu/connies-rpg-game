@@ -7,7 +7,7 @@ use glium::index::PrimitiveType::TrianglesList;
 use glium::{Blend, Depth, DepthTest, DrawParameters, IndexBuffer, VertexBuffer};
 use glium::texture::SrgbTexture2d;
 use glium::framebuffer::SimpleFrameBuffer;
-use glium::uniforms::MagnifySamplerFilter;
+use glium::uniforms::{MagnifySamplerFilter, UniformBuffer};
 
 use std::collections::VecDeque;
 
@@ -39,6 +39,8 @@ pub struct System {
 
     fxaa_shader: glium::Program,
     fxaa_buffer: Option<SrgbTexture2d>,
+
+    camera_buffer: UniformBuffer<Camera>,
 }
 
 impl System {
@@ -72,6 +74,8 @@ impl System {
 
         let fxaa_shader = shaders::load_fxaa_shader(&display);
 
+        let camera_buffer = UniformBuffer::empty_dynamic(&display).unwrap();
+
         System {
             events_loop: Some(events_loop),
             display,
@@ -86,6 +90,8 @@ impl System {
 
             fxaa_shader,
             fxaa_buffer: None,
+
+            camera_buffer,
         }
     }
 
@@ -108,6 +114,8 @@ impl System {
 
         let instanced = instance_buffer.per_instance().unwrap();
 
+        self.camera_buffer.write(camera);
+
         surface
             .draw(
                 (&self.quad_vertices, instanced),
@@ -115,8 +123,7 @@ impl System {
                 &self.sprite_shader,
                 &uniform! {
                     tex: sampler,
-                    camera_view: camera.view,
-                    camera_proj: camera.proj,
+                    Camera: &self.camera_buffer,
                 },
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
@@ -146,6 +153,8 @@ impl System {
         let tile_data = unsafe { &*(tiles as *const [u16] as *const [TileInstance]) };
         tile_buffer.write(tile_data);
 
+        self.camera_buffer.write(camera);
+
         let tex = self.textures.get(tileset.texture);
         let tex_sampler = tex.tex
             .sampled()
@@ -164,8 +173,7 @@ impl System {
                     tileset: tileset_sampler,
                     first_gid: tileset.tileset.first_gid,
                     world_base_pos: base_pos,
-                    camera_view: camera.view,
-                    camera_proj: camera.proj,
+                    Camera: &self.camera_buffer,
                 },
                 &DrawParameters {
                     blend: Blend::alpha_blending(),

@@ -13,4 +13,10 @@ void main() {
     } else {
         f_color = vec4(0.0, 0.0, 0.0, 0.0);
     }
+
+    if (f_color.a < 0.25) {
+        gl_FragDepth = 0;
+    } else {
+        gl_FragDepth = gl_FragCoord.z;
+    }
 }

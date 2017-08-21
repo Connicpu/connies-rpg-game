@@ -26,16 +26,20 @@ extern crate toml;
 #[macro_use]
 extern crate lazy_static;
 
+use cgmath::Vector2;
 use ecs::system::EntitySystem;
 
 use std::path::Path;
 use std::fs::File;
 use std::io::Read;
 
+use math::ToRawMath;
+
 pub mod components;
 pub mod config;
 pub mod graphics;
 pub mod input;
+pub mod math;
 pub mod physics;
 pub mod timer;
 pub mod util;
@@ -66,12 +70,10 @@ lazy_static! {
 fn main() {
     util::panic_handler::init();
 
-
     let mut world = ecs::World::<Systems>::with_services(Services::default());
 
-    let mut x = 0.0;
-    let mut y = 0.0;
-    let cam_scale = 0.25;
+    let mut cam_pos = Vector2 { x: 8.5, y: -4.0 };
+    let cam_size = 8.0;
 
     let tilemap = tiled::parse_file(Path::new("resources/maps/testmap.tmx")).unwrap();
     let tileset = tilemap.tilesets[0].clone();
@@ -83,16 +85,16 @@ fn main() {
 
         let dt = world.data.services.timer.delta_time;
         if world.data.services.keyboard.is_held(winit::VirtualKeyCode::W) {
-            y += dt * 4.0;
+            cam_pos.y += dt * 4.0;
         }
         if world.data.services.keyboard.is_held(winit::VirtualKeyCode::A) {
-            x -= dt * 4.0;
+            cam_pos.x -= dt * 4.0;
         }
         if world.data.services.keyboard.is_held(winit::VirtualKeyCode::S) {
-            y -= dt * 4.0;
+            cam_pos.y -= dt * 4.0;
         }
         if world.data.services.keyboard.is_held(winit::VirtualKeyCode::D) {
-            x += dt * 4.0;
+            cam_pos.x += dt * 4.0;
         }
 
         if world.data.services.quit {
@@ -110,16 +112,14 @@ fn main() {
             frame.clear_depth(0.0);
 
             let dimensions = frame.get_dimensions();
-            let aspect = dimensions.1 as f32 / dimensions.0 as f32;
+            let aspect = dimensions.0 as f32 / dimensions.1 as f32;
+
+            let view = math::matrices::view(cam_pos, cam_size, 0.0);
+            let ortho = math::matrices::ortho(aspect, 100.0, -100.0);
 
             let camera = Camera {
-                view: [[cam_scale, 0.0, -x * cam_scale],
-                       [0.0, cam_scale, -y * cam_scale],
-                       [0.0, 0.0, 1.0]],
-                proj: [[aspect, 0.0, 0.0, 0.0],
-                       [   0.0, 1.0, 0.0, 0.0],
-                       [   0.0, 0.0, 1.0, 0.0],
-                       [   0.0, 0.0, 0.0, 1.0]],
+                view: view.to_raw(),
+                proj: ortho.to_raw(),
             };
 
             let tiles = [
