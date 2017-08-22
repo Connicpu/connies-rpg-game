@@ -17,11 +17,11 @@ use CONFIG;
 
 pub use graphics::quad_types::{Camera, QuadVertex, SpriteInstance};
 pub use graphics::textures::TextureId;
-pub use graphics::end_frame::EndFrame;
+pub use graphics::systems::all::*;
 
-pub mod end_frame;
 pub mod quad_types;
 pub mod shaders;
+pub mod systems;
 pub mod textures;
 pub mod tileset;
 
@@ -30,6 +30,7 @@ pub struct System {
     pub display: glium::Display,
     pub textures: textures::TextureManager,
     pub dpi: f32,
+    pub current_frame: Option<glium::Frame>,
 
     quad_vertices: glium::VertexBuffer<QuadVertex>,
     quad_indices: glium::IndexBuffer<u32>,
@@ -81,6 +82,7 @@ impl System {
             display,
             textures,
             dpi,
+            current_frame: None,
 
             quad_vertices,
             quad_indices,

@@ -7,6 +7,8 @@ pub struct TilesetDesc {
     pub tileset: Tileset,
     pub texture: TextureId,
     pub tile_uv: Texture1d,
+    pub rows: u32,
+    pub cols: u32,
 }
 
 impl TilesetDesc {
@@ -19,12 +21,12 @@ impl TilesetDesc {
         let th = tileset.tile_height;
         let ts = tileset.spacing;
 
-        let columns = (iw as u32 + 1) / (tw + ts);
+        let cols = (iw as u32 + 1) / (tw + ts);
         let rows = (ih as u32 + 1) / (th + ts);
 
         let mut data = vec![];
         for y in 0..rows {
-            for x in 0..columns {
+            for x in 0..cols {
                 let u0 = ((x * (tw + ts)) as f32 + 0.05) / iw as f32;
                 let v0 = ((y * (th + ts)) as f32 + 0.05) / ih as f32;
                 let u1 = u0 + (tw as f32 - 0.1) / iw as f32;
@@ -45,6 +47,8 @@ impl TilesetDesc {
             tileset,
             texture,
             tile_uv,
+            rows,
+            cols,
         }
     }
 }

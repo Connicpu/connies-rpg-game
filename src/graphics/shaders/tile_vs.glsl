@@ -9,6 +9,7 @@ in vec2 uv;
 in uint tile_id;
 
 uniform uint first_gid;
+uniform uint end_gid;
 uniform vec3 world_base_pos;
 
 uniform Camera {
@@ -19,7 +20,6 @@ uniform Camera {
 uniform sampler1D tileset;
 
 out vec2 v_uv;
-out uint v_tile_id;
 
 void main() {
     int instX = gl_InstanceID & 7;
@@ -28,8 +28,11 @@ void main() {
     gl_Position = vec4(vpos, world_base_pos.z, 1.0) * view * proj;
     
     vec4 uv_rect = texelFetch(tileset, int(tile_id - first_gid), 0);
-    v_uv = mix(uv_rect.xy, uv_rect.zw, uv.xy);
 
-    v_tile_id = tile_id;
+    if (tile_id >= first_gid && tile_id < end_gid) {
+        v_uv = mix(uv_rect.xy, uv_rect.zw, uv.xy);
+    } else {
+        v_uv = (-1, -1);
+    }
 }
 
