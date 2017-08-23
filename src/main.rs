@@ -74,19 +74,9 @@ fn main() {
     util::panic_handler::init();
 
     let mut world = ecs::World::<Systems>::with_services(Services::default());
+    load_test_map(&mut world);
 
-    let tmap = tiled::parse_file(std::path::Path::new("resources/maps/testmap.tmx")).unwrap();
-    let map = tilemap::load_map(tmap, &mut world.data.services.graphics);
-    world.data.services.current_map = Some(map);
-
-    loop {
-        process!(world, update_time);
-        process!(world, update_input);
-
-        if world.data.services.quit {
-            break;
-        }
-
+    while !world.data.services.quit {
         world.update();
     }
 }
@@ -103,6 +93,9 @@ components! {
 systems! {
     struct Systems<Components, Services> {
         active: {
+            update_time: timer::UpdateTime = timer::UpdateTime,
+            update_input: input::UpdateInput = input::UpdateInput,
+
             physics_run: physics::PhysicsRun = physics::PhysicsRun,
             physics_update: EntitySystem<physics::PhysicsUpdate> = physics::PhysicsUpdate::new(),
 
@@ -111,8 +104,12 @@ systems! {
             end_frame: graphics::EndFrame = graphics::EndFrame,
         },
         passive: {
-            update_time: timer::UpdateTime = timer::UpdateTime,
-            update_input: input::UpdateInput = input::UpdateInput,
         }
     }
+}
+
+fn load_test_map(world: &mut ecs::World<Systems>) {
+    let tmap = tiled::parse_file(std::path::Path::new("resources/maps/testmap.tmx")).unwrap();
+    let map = tilemap::load_map(tmap, &mut world.data.services.graphics);
+    world.data.services.current_map = Some(map);
 }

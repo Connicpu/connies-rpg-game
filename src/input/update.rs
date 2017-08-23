@@ -1,7 +1,9 @@
 use ecs::system::{Process, System};
-use input::keyboard::KeyboardUpdate;
 use winit::WindowEvent::*;
 use winit::{self, ElementState};
+
+use util::Mutate;
+use input::keyboard::KeyboardUpdate;
 
 pub struct UpdateInput;
 
@@ -45,16 +47,22 @@ impl Process for UpdateInput {
 
         let dt = data.services.timer.delta_time;
         if data.services.keyboard.is_held(winit::VirtualKeyCode::D) {
-            data.services.camera.pos.x += 4.0 * dt;
+            data.services.camera.pos.x += 6.0 * dt;
         }
         if data.services.keyboard.is_held(winit::VirtualKeyCode::A) {
-            data.services.camera.pos.x -= 4.0 * dt;
+            data.services.camera.pos.x -= 6.0 * dt;
         }
         if data.services.keyboard.is_held(winit::VirtualKeyCode::W) {
-            data.services.camera.pos.y += 4.0 * dt;
+            data.services.camera.pos.y += 6.0 * dt;
         }
         if data.services.keyboard.is_held(winit::VirtualKeyCode::S) {
-            data.services.camera.pos.y -= 4.0 * dt;
+            data.services.camera.pos.y -= 6.0 * dt;
         }
+
+        let aspect = data.services.camera.aspect_ratio;
+        data.services.camera.pos.mutate(|cpos| {
+            cpos.y = cpos.y.max(-252.0).min(252.0);
+            cpos.x = cpos.x.max(4.0 * aspect).min(256.0 - 4.0 * aspect);
+        });
     }
 }

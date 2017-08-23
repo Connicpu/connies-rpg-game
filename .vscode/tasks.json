@@ -24,6 +24,16 @@
                 "test"
             ],
             "isTestCommand": true
+        },
+        {
+            "taskName": "profiler init",
+            "command": "powershell",
+            "args": ["-File", "${workspaceRoot}/.perf/profiler_start.ps1"]
+        },
+        {
+            "taskName": "profile",
+            "command": "powershell",
+            "args": ["-File", "${workspaceRoot}/.perf/profiler_launch.ps1"]
         }
     ]
 }

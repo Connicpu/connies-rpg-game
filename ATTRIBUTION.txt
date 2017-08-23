@@ -1,7 +1,7 @@
 Libraries
 ---------
 
-Amethyst Game Engine (https://www.amethyst.rs/), MIT license
+TODO
 
 
 Fonts
