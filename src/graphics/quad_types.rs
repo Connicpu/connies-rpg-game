@@ -17,7 +17,8 @@ pub struct SpriteInstance {
 
 implement_vertex!(SpriteInstance, center, scale, rot, uv_rect, world_pos);
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
+#[repr(C)]
 pub struct Camera {
     pub proj: [[f32; 4]; 4],
     pub view: [[f32; 4]; 4],

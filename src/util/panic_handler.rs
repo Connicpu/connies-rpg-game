@@ -53,8 +53,8 @@ fn display_panic(info: &panic::PanicInfo) {
     let skip_lines;
     let tail_lines;
     #[cfg(debug_assertions)] {
-        skip_lines = 6;
-        tail_lines = 5;
+        skip_lines = 0;//6;
+        tail_lines = 0;//5;
     }
     #[cfg(not(debug_assertions))] {
         skip_lines = 5;

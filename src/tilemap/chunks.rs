@@ -3,6 +3,8 @@ use std::cmp;
 
 use tilemap::MapBuilder;
 
+const MAX_TILESETS: usize = 7;
+
 pub struct Chunks {
     pub chunks: Vec<Chunk>,
     pub chunks_width: usize,
@@ -10,16 +12,16 @@ pub struct Chunks {
 
 pub struct Chunk {
     pub tiles: [u16; 64],
-    pub tilesets: [(u16, (u16, u16)); 8],
+    pub tilesets: [u16; MAX_TILESETS],
     pub tilesets_count: u16,
 }
 
 impl Chunks {
-    pub fn from_map(b: &MapBuilder, layer: usize) -> Self {
+    pub fn build(b: &MapBuilder, layer: usize) -> Self {
         let mut chunks = vec![];
 
-        for i in 0..((b.map.height + 7) / 8) {
-            for j in 0..((b.map.width + 7) / 8) {
+        for i in 0..b.v_chunks {
+            for j in 0..b.h_chunks {
                 chunks.push(Chunk::build(b, layer, j * 8, i * 8));
             }
         }
@@ -34,7 +36,7 @@ impl Chunks {
 impl Chunk {
     fn build(b: &MapBuilder, layer: usize, x: u32, y: u32) -> Self {
         let mut tiles = [0; 64];
-        let mut tilesets = [(0, (0, 0)); 8];
+        let mut tilesets = [0; MAX_TILESETS];
         let mut tilesets_h = HashSet::new();
 
         for i in 0..8 {
@@ -57,7 +59,7 @@ impl Chunk {
             }
         }
 
-        let tilesets_count = cmp::min(tilesets_h.len(), 8) as u16;
+        let tilesets_count = cmp::min(tilesets_h.len(), MAX_TILESETS) as u16;
         for (i, &tileset) in tilesets_h.iter().take(tilesets_count as usize).enumerate() {
             tilesets[i] = tileset;
         }
@@ -69,12 +71,12 @@ impl Chunk {
         }
     }
 
-    fn find_tileset(b: &MapBuilder, gid: u32) -> Option<(u16, (u16, u16))> {
-        b.tilesets.as_ref().unwrap().tileset_descs.iter().enumerate().filter_map(|(i, t)| {
+    fn find_tileset(b: &MapBuilder, gid: u32) -> Option<u16> {
+        b.tilesets.tileset_descs.iter().enumerate().filter_map(|(i, t)| {
             let first = t.tileset.first_gid;
             let last = first + t.rows * t.cols;
             if (first..last).contains(gid) {
-                Some((i as u16, (first as u16, last as u16)))
+                Some(i as u16)
             } else {
                 None
             }

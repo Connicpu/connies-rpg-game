@@ -55,8 +55,9 @@ pub struct Services {
     pub graphics: graphics::System,
 
     pub camera: math::Camera,
-
     pub keyboard: input::KeyboardState,
+
+    pub current_map: Option<tilemap::Map>,
 }
 
 pub type DataHelper = ecs::DataHelper<Components, Services>;
@@ -74,12 +75,9 @@ fn main() {
 
     let mut world = ecs::World::<Systems>::with_services(Services::default());
 
-    /*let mut cam_pos = Vector2 { x: 8.5, y: -4.0 };
-    let cam_size = 8.0;
-
-    let tilemap = tiled::parse_file(Path::new("resources/maps/testmap.tmx")).unwrap();
-    let tileset = tilemap.tilesets[0].clone();
-    let tileset = graphics::tileset::TilesetDesc::load(&mut world.data.services.graphics, tileset);*/
+    let tmap = tiled::parse_file(std::path::Path::new("resources/maps/testmap.tmx")).unwrap();
+    let map = tilemap::load_map(tmap, &mut world.data.services.graphics);
+    world.data.services.current_map = Some(map);
 
     loop {
         process!(world, update_time);
@@ -106,8 +104,7 @@ systems! {
     struct Systems<Components, Services> {
         active: {
             physics_run: physics::PhysicsRun = physics::PhysicsRun,
-            physics_update: EntitySystem<physics::PhysicsUpdate> =
-                EntitySystem::new(physics::PhysicsUpdate, aspect!(<Components> all: [transform, body])),
+            physics_update: EntitySystem<physics::PhysicsUpdate> = physics::PhysicsUpdate::new(),
 
             begin_frame: graphics::BeginFrame = graphics::BeginFrame,
             temp_draw: graphics::TempDraw = graphics::TempDraw,

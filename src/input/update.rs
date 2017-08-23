@@ -42,5 +42,19 @@ impl Process for UpdateInput {
         });
 
         data.services.graphics.events_loop = Some(ev_loop);
+
+        let dt = data.services.timer.delta_time;
+        if data.services.keyboard.is_held(winit::VirtualKeyCode::D) {
+            data.services.camera.pos.x += 4.0 * dt;
+        }
+        if data.services.keyboard.is_held(winit::VirtualKeyCode::A) {
+            data.services.camera.pos.x -= 4.0 * dt;
+        }
+        if data.services.keyboard.is_held(winit::VirtualKeyCode::W) {
+            data.services.camera.pos.y += 4.0 * dt;
+        }
+        if data.services.keyboard.is_held(winit::VirtualKeyCode::S) {
+            data.services.camera.pos.y -= 4.0 * dt;
+        }
     }
 }

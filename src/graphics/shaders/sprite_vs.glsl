@@ -1,5 +1,4 @@
 #version 330
-uniform layout(std140);
 
 in vec2 pos;
 in vec2 uv;
@@ -10,10 +9,8 @@ in mat2 rot;
 in vec4 uv_rect;
 in vec3 world_pos;
 
-uniform Camera {
-    mat4 proj;
-    mat4 view;
-};
+uniform mat4 proj;
+uniform mat4 view;
 
 out vec2 v_uv;
 

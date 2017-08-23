@@ -9,6 +9,7 @@ pub struct TilesetDesc {
     pub tile_uv: Texture1d,
     pub rows: u32,
     pub cols: u32,
+    pub end_gid: u32,
 }
 
 impl TilesetDesc {
@@ -43,12 +44,15 @@ impl TilesetDesc {
             MipmapsOption::NoMipmap,
         ).unwrap();
 
+        let end_gid = tileset.first_gid + rows * cols;
+
         TilesetDesc {
             tileset,
             texture,
             tile_uv,
             rows,
             cols,
+            end_gid,
         }
     }
 }

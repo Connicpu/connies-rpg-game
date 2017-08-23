@@ -23,13 +23,14 @@ pub fn view(pos: Vector2<f32>, size: f32, rot: f32) -> Matrix4<f32> {
 }
 
 pub fn ortho(aspect: f32, near: f32, far: f32) -> Matrix4<f32> {
-    let n2f = near - far;
+    let n2f = 1.0 / (far - near);
     let toa = 2.0 / aspect;
+    let oof = 1.0 / near;
 
     [
         [toa, 0.0, 0.0, 0.0],
         [0.0, 2.0, 0.0, 0.0],
-        [0.0, 0.0, n2f, far],
+        [0.0, 0.0, n2f, oof],
         [0.0, 0.0, 0.0, 1.0],
     ].into()
 }

@@ -27,8 +27,8 @@ impl ToRawMath for Camera {
 impl Default for Camera {
     fn default() -> Self {
         Camera {
-            pos: Vector2 { x: 0.0, y: 0.0 },
-            viewport_height: 1.0,
+            pos: Vector2 { x: 0.0, y: -256.0 },
+            viewport_height: 8.0,
             aspect_ratio: 1.0,
             roll: 0.0,
             near: -100.0,

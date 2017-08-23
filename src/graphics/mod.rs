@@ -7,13 +7,14 @@ use glium::index::PrimitiveType::TrianglesList;
 use glium::{Blend, Depth, DepthTest, DrawParameters, IndexBuffer, VertexBuffer};
 use glium::texture::SrgbTexture2d;
 use glium::framebuffer::SimpleFrameBuffer;
-use glium::uniforms::{MagnifySamplerFilter, UniformBuffer};
+use glium::uniforms::{MagnifySamplerFilter};
 
 use std::collections::VecDeque;
 
+use CONFIG;
 use graphics::quad_types::{QUAD_INDICES, QUAD_VERTICES};
 use graphics::tileset::{TileInstance, TilesetDesc};
-use CONFIG;
+use tilemap;
 
 pub use graphics::quad_types::{Camera, QuadVertex, SpriteInstance};
 pub use graphics::textures::TextureId;
@@ -41,7 +42,7 @@ pub struct System {
     fxaa_shader: glium::Program,
     fxaa_buffer: Option<SrgbTexture2d>,
 
-    camera_buffer: UniformBuffer<Camera>,
+    camera: Camera,
 }
 
 impl System {
@@ -71,11 +72,9 @@ impl System {
         let quad_indices = IndexBuffer::new(&display, TrianglesList, &QUAD_INDICES[..]).unwrap();
         let sprite_shader = shaders::load_sprite_shader(&display);
         let tile_shader = shaders::load_tile_shader(&display);
-        let tile_buffers = (0..16).map(|_| Self::make_tile_buffer(&display)).collect();
+        let tile_buffers = (0..1024).map(|_| Self::make_tile_buffer(&display)).collect();
 
         let fxaa_shader = shaders::load_fxaa_shader(&display);
-
-        let camera_buffer = UniformBuffer::empty_dynamic(&display).unwrap();
 
         System {
             events_loop: Some(events_loop),
@@ -93,14 +92,17 @@ impl System {
             fxaa_shader,
             fxaa_buffer: None,
 
-            camera_buffer,
+            camera: Default::default(),
         }
+    }
+
+    pub fn set_camera(&mut self, camera: &Camera) {
+        self.camera = *camera;
     }
 
     pub fn draw_sprites<S>(
         &mut self,
         surface: &mut S,
-        camera: &Camera,
         instances: &[SpriteInstance],
         texture: TextureId,
     ) where
@@ -114,18 +116,17 @@ impl System {
             .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest)
             .minify_filter(glium::uniforms::MinifySamplerFilter::Linear);
 
-        let instanced = instance_buffer.per_instance().unwrap();
-
-        self.camera_buffer.write(camera);
+        let instances = instance_buffer.per_instance().unwrap();
 
         surface
             .draw(
-                (&self.quad_vertices, instanced),
+                (&self.quad_vertices, instances),
                 &self.quad_indices,
                 &self.sprite_shader,
                 &uniform! {
                     tex: sampler,
-                    Camera: &self.camera_buffer,
+                    proj: self.camera.proj,
+                    view: self.camera.view,
                 },
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
@@ -143,8 +144,8 @@ impl System {
     pub fn draw_tiles<S>(
         &mut self,
         surface: &mut S,
-        camera: &Camera,
         base_pos: [f32; 3],
+        tint: [f32; 4],
         tiles: &[u16],
         tileset: &TilesetDesc,
     ) where
@@ -154,8 +155,6 @@ impl System {
 
         let tile_data = unsafe { &*(tiles as *const [u16] as *const [TileInstance]) };
         tile_buffer.write(tile_data);
-
-        self.camera_buffer.write(camera);
 
         let tex = self.textures.get(tileset.texture);
         let tex_sampler = tex.tex
@@ -174,8 +173,11 @@ impl System {
                     tex: tex_sampler,
                     tileset: tileset_sampler,
                     first_gid: tileset.tileset.first_gid,
+                    end_gid: tileset.end_gid,
                     world_base_pos: base_pos,
-                    Camera: &self.camera_buffer,
+                    tint: tint,
+                    proj: self.camera.proj,
+                    view: self.camera.view,
                 },
                 &DrawParameters {
                     blend: Blend::alpha_blending(),
@@ -190,6 +192,22 @@ impl System {
             .expect("draw shouldn't fail");
 
         self.tile_buffers.push_back(tile_buffer);
+    }
+
+    pub fn draw_tile_chunk<S>(
+        &mut self,
+        surface: &mut S,
+        base_pos: [f32; 3],
+        tint: [f32; 4],
+        chunk: &tilemap::Chunk,
+        tilesets: &tilemap::Tilesets,
+    ) where
+        S: glium::Surface,
+    {
+        for &set in &chunk.tilesets[0..chunk.tilesets_count as usize] {
+            let desc = &tilesets.tileset_descs[set as usize];
+            self.draw_tiles(surface, base_pos, tint, &chunk.tiles, desc);
+        }
     }
 
     pub fn fxaa<S>(&mut self, surface: &mut S)

@@ -15,7 +15,7 @@ pub fn load_tile_shader(display: &Display) -> Program {
         display,
         330 => {
             vertex: include_str!("tile_vs.glsl"),
-            fragment: include_str!("sprite_fs.glsl"),
+            fragment: include_str!("tile_fs.glsl"),
         }
     ).unwrap()
 }
