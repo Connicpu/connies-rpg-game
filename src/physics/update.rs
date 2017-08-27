@@ -1,15 +1,13 @@
-use ecs::EntityIter;
-
-use Components;
 use DataHelper;
+use EntityIter;
 
-def_system! {
-    #[entity]
-    #[aspect(all: [body, transform])]
-    pub struct PhysicsUpdate;
-}
+#[derive(Default, System)]
+#[system_type(Entity)]
+#[process(process)]
+#[aspect(all(body, transform))]
+pub struct PhysicsUpdate;
 
-fn process(entities: EntityIter<Components>, data: &mut DataHelper) {
+fn process(_: &mut PhysicsUpdate, entities: EntityIter, data: &mut DataHelper) {
     for entity in entities {
         let body_handle = data.components.body[entity].handle;
         let body = data.services.physics.world.body(body_handle);

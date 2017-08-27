@@ -16,7 +16,8 @@ extern crate glutin;
 extern crate winit;
 
 #[macro_use]
-extern crate ecs;
+extern crate conniecs_derive;
+extern crate conniecs;
 
 #[macro_use]
 extern crate serde_derive;
@@ -26,13 +27,9 @@ extern crate toml;
 #[macro_use]
 extern crate lazy_static;
 
-use ecs::system::EntitySystem;
+use conniecs::EntitySystem;
 
-use std::fs::File;
-use std::io::Read;
-
-#[macro_use]
-mod macros;
+pub use config::CONFIG;
 
 pub mod components;
 pub mod config;
@@ -44,8 +41,12 @@ pub mod tilemap;
 pub mod timer;
 pub mod util;
 
-impl ecs::ServiceManager for Services {}
-#[derive(Default)]
+pub type World = conniecs::World<Systems>;
+pub type DataHelper = conniecs::DataHelper<Components, Services>;
+pub type Comps<T> = conniecs::ComponentList<Components, T>;
+pub type EntityIter<'a> = conniecs::EntityIter<'a, Components>;
+
+#[derive(Default, ServiceManager)]
 pub struct Services {
     pub quit: bool,
     pub resized: bool,
@@ -60,20 +61,33 @@ pub struct Services {
     pub current_map: Option<tilemap::Map>,
 }
 
-pub type DataHelper = ecs::DataHelper<Components, Services>;
+#[derive(ComponentManager)]
+pub struct Components {
+    #[hot]
+    pub transform: Comps<components::Transform>,
+    #[hot]
+    pub sprite: Comps<components::Sprite>,
+    #[hot]
+    pub body: Comps<physics::Body>,
+}
 
-lazy_static! {
-    pub static ref CONFIG: config::Config = {
-        let mut config_data = vec![];
-        File::open("resources/config/config.toml").unwrap().read_to_end(&mut config_data).unwrap();
-        toml::from_slice(&config_data).unwrap()
-    };
+#[derive(SystemManager)]
+pub struct Systems {
+    pub update_time: timer::UpdateTime,
+    pub update_input: input::UpdateInput,
+
+    pub physics_run: physics::PhysicsRun,
+    pub physics_update: EntitySystem<physics::PhysicsUpdate>,
+
+    pub begin_frame: graphics::BeginFrame,
+    pub temp_draw: graphics::TempDraw,
+    pub end_frame: graphics::EndFrame,
 }
 
 fn main() {
     util::panic_handler::init();
 
-    let mut world = ecs::World::<Systems>::with_services(Services::default());
+    let mut world = World::new();
     load_test_map(&mut world);
 
     while !world.data.services.quit {
@@ -81,34 +95,7 @@ fn main() {
     }
 }
 
-components! {
-    #[builder(EntityBuilder)]
-    struct Components {
-        #[hot] transform: components::Transform,
-        #[hot] sprite: components::Sprite,
-        #[hot] body: physics::Body,
-    }
-}
-
-systems! {
-    struct Systems<Components, Services> {
-        active: {
-            update_time: timer::UpdateTime = timer::UpdateTime,
-            update_input: input::UpdateInput = input::UpdateInput,
-
-            physics_run: physics::PhysicsRun = physics::PhysicsRun,
-            physics_update: EntitySystem<physics::PhysicsUpdate> = physics::PhysicsUpdate::new(),
-
-            begin_frame: graphics::BeginFrame = graphics::BeginFrame,
-            temp_draw: graphics::TempDraw = graphics::TempDraw,
-            end_frame: graphics::EndFrame = graphics::EndFrame,
-        },
-        passive: {
-        }
-    }
-}
-
-fn load_test_map(world: &mut ecs::World<Systems>) {
+fn load_test_map(world: &mut conniecs::World<Systems>) {
     let tmap = tiled::parse_file(std::path::Path::new("resources/maps/testmap.tmx")).unwrap();
     let map = tilemap::load_map(tmap, &mut world.data.services.graphics);
     world.data.services.current_map = Some(map);

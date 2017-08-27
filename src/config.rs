@@ -1,3 +1,8 @@
+use toml;
+
+use std::fs::File;
+use std::io::Read;
+
 #[derive(Default, Deserialize, Clone)]
 pub struct Config {
     pub graphics: Graphics,
@@ -19,3 +24,13 @@ impl Default for Graphics {
         }
     }
 }
+
+lazy_static! {
+    pub static ref CONFIG: Config = {
+        let mut config_data = vec![];
+        let mut file = File::open("resources/config/config.toml").expect("TODO: fallback to default config");
+        file.read_to_end(&mut config_data).expect("TODO: fallback to default config");
+        toml::from_slice(&config_data).expect("TODO: fallback to default config")
+    };
+}
+

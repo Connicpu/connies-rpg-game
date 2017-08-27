@@ -1,5 +1,3 @@
-use ecs::system::{System, Process};
-
 use time;
 
 #[derive(Debug)]
@@ -52,14 +50,11 @@ impl Default for Timer {
     }
 }
 
+#[derive(Default, System)]
+#[process = "UpdateTime::process"]
 pub struct UpdateTime;
 
-impl System for UpdateTime {
-    type Components = ::Components;
-    type Services = ::Services;
-}
-
-impl Process for UpdateTime {
+impl UpdateTime {
     fn process(&mut self, data: &mut ::DataHelper) {
         data.services.timer.update();
     }

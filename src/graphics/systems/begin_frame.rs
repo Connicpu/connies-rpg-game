@@ -3,11 +3,11 @@ use glium::Surface;
 use DataHelper;
 use math::raw::ToRawMath;
 
-def_system! {
-    pub struct BeginFrame;
-}
+#[derive(Default, System)]
+#[process(process)]
+pub struct BeginFrame;
 
-fn process(data: &mut DataHelper) {
+fn process(_: &mut BeginFrame, data: &mut DataHelper) {
     let mut frame = data.services.graphics.display.draw();
     let (width, height) = frame.get_dimensions();
 
