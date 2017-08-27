@@ -43,7 +43,7 @@ pub mod util;
 
 pub type World = conniecs::World<Systems>;
 pub type DataHelper = conniecs::DataHelper<Components, Services>;
-pub type Comps<T> = conniecs::ComponentList<Components, T>;
+pub type ComponentList<T> = conniecs::ComponentList<Components, T>;
 pub type EntityIter<'a> = conniecs::EntityIter<'a, Components>;
 
 #[derive(Default, ServiceManager)]
@@ -64,11 +64,11 @@ pub struct Services {
 #[derive(ComponentManager)]
 pub struct Components {
     #[hot]
-    pub transform: Comps<components::Transform>,
+    pub transform: ComponentList<components::Transform>,
     #[hot]
-    pub sprite: Comps<components::Sprite>,
+    pub sprite: ComponentList<components::Sprite>,
     #[hot]
-    pub body: Comps<physics::Body>,
+    pub body: ComponentList<physics::Body>,
 }
 
 #[derive(SystemManager)]
