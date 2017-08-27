@@ -5,10 +5,10 @@ fn main() {
     let target = env::var("TARGET").unwrap();
     let mut manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     manifest_dir.push("lib");
+    let mut lib_dir = manifest_dir.clone();
+    let mut dll_dir = manifest_dir.clone();
 
     let (mut lib_dir, mut dll_dir) = if target.contains("pc-windows") {
-        let mut lib_dir = manifest_dir.clone();
-        let mut dll_dir = manifest_dir.clone();
         if target.contains("msvc") {
             lib_dir.push("msvc");
             dll_dir.push("msvc");
@@ -18,6 +18,10 @@ fn main() {
             dll_dir.push("gnu-mingw");
         }
 
+        (lib_dir, dll_dir)
+    } else if target.contains("linux") {
+        lib_dir.push("linux");
+        dll_dir.push("linux");
         (lib_dir, dll_dir)
     } else {
         return;

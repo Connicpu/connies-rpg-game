@@ -50,23 +50,9 @@ fn trim_path(path: &Path) -> String {
 fn display_panic(info: &panic::PanicInfo) {
     let backtrace = Backtrace::new();
 
-    let skip_lines;
-    let tail_lines;
-    #[cfg(debug_assertions)] {
-        skip_lines = 0;//6;
-        tail_lines = 0;//5;
-    }
-    #[cfg(not(debug_assertions))] {
-        skip_lines = 5;
-        tail_lines = 4;
-    }
-    let take_lines = backtrace.frames().len() - skip_lines - tail_lines;
-
     let backtrace: String = backtrace
         .frames()
         .iter()
-        .skip(skip_lines)
-        .take(take_lines)
         .flat_map(|frame| {
             if frame.symbols().len() == 0 {
                 return vec![format!("Unresolved symbol {:?}", frame.symbol_address())].into_iter();
