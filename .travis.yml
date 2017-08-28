@@ -6,6 +6,5 @@ env:
 
 before_install:
   - sudo apt-get -qq update
-  #- sudo apt-get install -y libmesa-dev
   - sudo apt-get install -y freeglut3-dev
   - sudo apt-get install -y libgtk-3-dev
