@@ -1,0 +1,5 @@
+language: rust
+rust:
+  - nightly
+env:
+ - BOX2D_INCLUDE_PATH="$TRAVIS_BUILD_DIR/lib/include"
