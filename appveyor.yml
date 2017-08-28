@@ -10,6 +10,9 @@ install:
   - rustc -vV
   - cargo -vV
 
+install:
+  - git submodule update --init --recursive
+
 build_script:
   - cargo build
 
