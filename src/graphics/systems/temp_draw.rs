@@ -24,7 +24,7 @@ fn process(_: &mut TempDraw, data: &mut DataHelper) {
     
     let graphics_cam = data.services.camera.to_raw ();
     let camera_view_proj = Matrix4::<f32>::from (graphics_cam.view) * Matrix4::<f32>::from(graphics_cam.proj);
-    let inverse_camera_view_proj: &mut Matrix4 <f32> = &mut camera_view_proj.transpose ().invert ().unwrap ();
+    let inverse_camera_view_proj: &mut Matrix4 <f32> = &mut camera_view_proj.transpose().invert().unwrap ();
     
     let mut camera_aabb_min: Point3<f32> = Point3::<f32> {x: f32::MAX, y: f32::MAX, z: 0.0};
     let mut camera_aabb_max: Point3<f32> = Point3::<f32> {x: f32::MIN, y: f32::MIN, z: 0.0};
