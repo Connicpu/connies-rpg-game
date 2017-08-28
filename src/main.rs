@@ -59,7 +59,6 @@ pub struct Services {
     pub keyboard: input::KeyboardState,
 
     pub current_map: Option<tilemap::Map>,
-    pub player: Option<conniecs::Entity>,
 }
 
 #[derive(ComponentManager)]
@@ -93,11 +92,6 @@ fn main() {
 
     while !world.data.services.quit {
         world.update();
-
-        let player = world.data.services.player.unwrap();
-        world.data.with_entity_data(player, |e, c, _| {
-            println!("{:?}", c.transform[e].pos);
-        });
     }
 }
 
