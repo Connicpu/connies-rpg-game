@@ -23,9 +23,9 @@ impl Map {
     pub fn create_physics(&self, layer: usize, physics: &mut p::World) {
         let (hc, vc) = (self.h_chunks, self.v_chunks);
         let coords = (0..hc).flat_map(|y| (0..vc).map(move |x| (x, y)));
-        for (chunk, (x, y)) in self.layers[1].chunks.chunks.iter().zip(coords) {
+        for (chunk, (x, y)) in self.layers[layer].chunks.chunks.iter().zip(coords) {
             let pos = [x as f32 * 8.0, y as f32 * -8.0];
-            chunk.build_physics(&mut physics, &self.tilesets, pos);
+            chunk.build_physics(physics, &self.tilesets, pos);
         }
     }
 }
