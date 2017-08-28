@@ -2,6 +2,7 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
+    
     let target = env::var("TARGET").unwrap();
     let mut manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     manifest_dir.push("lib");
@@ -22,6 +23,12 @@ fn main() {
     } else if target.contains("linux") {
         lib_dir.push("linux");
         dll_dir.push("linux");
+        
+        (lib_dir, dll_dir)
+    } else if target.contains ( "darwin" ) {
+        lib_dir.push ( "darwin" );
+        dll_dir.push ( "darwin" );
+        
         (lib_dir, dll_dir)
     } else {
         return;
@@ -48,7 +55,7 @@ fn main() {
 
             if let Some(file_name) = file_name_result {
                 let file_name = file_name.to_str().unwrap();
-                if file_name.ends_with(".dll") {
+                if file_name.ends_with( ".dll" ) || file_name.ends_with( ".dylib" ) {
                     new_file_path.push(file_name);
                     std::fs::copy(&entry_path, new_file_path.as_path()).expect("Can't copy from DLL dir");
                 }
