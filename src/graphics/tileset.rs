@@ -1,10 +1,13 @@
 use glium::texture::{MipmapsOption, Texture1d, UncompressedFloatFormat};
 use tiled::Tileset;
 
+use std::collections::HashMap;
+
 use graphics::{self, TextureId};
 
 pub struct TilesetDesc {
     pub tileset: Tileset,
+    pub tile_gids: HashMap<u16, u16>,
     pub texture: TextureId,
     pub tile_uv: Texture1d,
     pub rows: u32,
@@ -37,6 +40,12 @@ impl TilesetDesc {
             }
         }
 
+        let mut tile_gids = HashMap::with_capacity(tileset.tiles.len());
+        for (i, tile) in tileset.tiles.iter().enumerate() {
+            let id = tile.id + tileset.first_gid;
+            tile_gids.insert(id as u16, i as u16);
+        }
+
         let tile_uv = Texture1d::with_format(
             &graphics.display,
             data,
@@ -48,6 +57,7 @@ impl TilesetDesc {
 
         TilesetDesc {
             tileset,
+            tile_gids,
             texture,
             tile_uv,
             rows,

@@ -1,5 +1,7 @@
 use wrapped2d::{self, b2};
 
+use conniecs::Entity;
+
 pub use self::body::Body;
 pub use self::run::PhysicsRun;
 pub use self::update::PhysicsUpdate;
@@ -30,7 +32,7 @@ impl Default for World {
 pub struct EntityUserData;
 
 impl wrapped2d::user_data::UserDataTypes for EntityUserData {
-    type BodyData = (); // TODO
+    type BodyData = Entity;
     type JointData = ();
     type FixtureData = ();
 }

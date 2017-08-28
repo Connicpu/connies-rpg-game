@@ -98,5 +98,8 @@ fn main() {
 fn load_test_map(world: &mut conniecs::World<Systems>) {
     let tmap = tiled::parse_file(std::path::Path::new("resources/maps/testmap.tmx")).unwrap();
     let map = tilemap::load_map(tmap, &mut world.data.services.graphics);
+
+    map.create_physics(1, &mut world.data.services.physics);
+
     world.data.services.current_map = Some(map);
 }

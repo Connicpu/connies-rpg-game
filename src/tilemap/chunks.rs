@@ -1,7 +1,12 @@
+use wrapped2d::b2;
+
 use std::collections::HashSet;
 use std::cmp;
 
 use tilemap::MapBuilder;
+use tilemap::Tilesets;
+use graphics::tileset::TilesetDesc;
+use physics as p;
 
 const MAX_TILESETS: usize = 7;
 
@@ -52,7 +57,7 @@ impl Chunk {
                 tiles[(i * 8 + j) as usize] = tile as u16;
 
                 if tile != 0 {
-                    if let Some(tileset) = Chunk::find_tileset(b, tile) {
+                    if let Some(tileset) = find_tileset(&b.tilesets, tile) {
                         tilesets_h.insert(tileset);
                     }
                 }
@@ -71,8 +76,43 @@ impl Chunk {
         }
     }
 
-    fn find_tileset(b: &MapBuilder, gid: u32) -> Option<u16> {
-        b.tilesets.tileset_descs.iter().enumerate().filter_map(|(i, t)| {
+    pub fn build_physics(
+        &self,
+        world: &mut p::World,
+        tilesets: &Tilesets,
+        pos: [f32; 2],
+    ) -> b2::BodyHandle {
+        let desc = b2::BodyDef {
+            body_type: b2::BodyType::Static,
+            position: b2::Vec2 {
+                x: pos[0],
+                y: pos[1],
+            },
+
+            ..b2::BodyDef::new()
+        };
+        let handle = world.world.create_body(&desc);
+
+        let coords = (0i32..8).flat_map(|y| (0i32..8).map(move |x| (x, y)));
+        for (&tile, (x, y)) in self.tiles.iter().zip(coords) {
+            if let Some(tileset_i) = find_tileset(tilesets, tile as u32) {
+                let offset = [x as f32, -y as f32];
+                let ref tileset = tilesets.tileset_descs[tileset_i as usize];
+
+                fixture_for_tile(world, handle, offset, tile, tileset);
+            }
+        }
+
+        handle
+    }
+}
+
+fn find_tileset(tilesets: &Tilesets, gid: u32) -> Option<u16> {
+    tilesets
+        .tileset_descs
+        .iter()
+        .enumerate()
+        .filter_map(|(i, t)| {
             let first = t.tileset.first_gid;
             let last = first + t.rows * t.cols;
             if (first..last).contains(gid) {
@@ -80,6 +120,61 @@ impl Chunk {
             } else {
                 None
             }
-        }).nth(0)
+        })
+        .nth(0)
+}
+
+fn fixture_for_tile(
+    world: &mut p::World,
+    body: b2::BodyHandle,
+    offset: [f32; 2],
+    tile: u16,
+    tileset: &TilesetDesc,
+) {
+    let ts = 16.0; // TODO: Don't hardcode this?
+    let (ox, oy) = (offset[0], offset[1]);
+
+    if let Some(&tile_i) = tileset.tile_gids.get(&tile) {
+        let ref tile = tileset.tileset.tiles[tile_i as usize];
+        if let Some(ref objectgroup) = tile.objectgroup {
+            for object in objectgroup.objects.iter() {
+                use tiled::ObjectShape::*;
+                let (x, y) = (object.x / ts, object.y / ts);
+                match object.shape {
+                    Rect { width, height } => {
+                        let (w, h) = (width / ts, height / ts);
+                        let verts = rect_fixture(ox, oy, x, y, w, h);
+                        let shape = b2::PolygonShape::new_with(&verts);
+
+                        world.world.body_mut(body).create_fast_fixture(&shape, 1.0);
+                    }
+                    ref shape => unimplemented!(
+                        "Unimplemented Tile ObjectShape in collision definition: {:?}",
+                        shape
+                    ),
+                }
+            }
+        }
     }
+}
+
+fn rect_fixture(ox: f32, oy: f32, x: f32, y: f32, w: f32, h: f32) -> [b2::Vec2; 4] {
+    [
+        b2::Vec2 {
+            x: ox + x,
+            y: oy + y,
+        },
+        b2::Vec2 {
+            x: ox + x + w,
+            y: oy + y,
+        },
+        b2::Vec2 {
+            x: ox + x + w,
+            y: oy + y + h,
+        },
+        b2::Vec2 {
+            x: ox + x,
+            y: oy + y + h,
+        },
+    ]
 }

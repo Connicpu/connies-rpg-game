@@ -25,8 +25,12 @@ impl Timer {
 
     pub fn update(&mut self) {
         let now = time::precise_time_ns();
-        let diff_time = now - self.time;
+        let mut diff_time = now - self.time;
         let running_time = now - self.start_time;
+
+        if diff_time > 100_000_000 {
+            diff_time = 100_000_000;
+        }
 
         // If we process the floats in nanoseconds we'll be wrecking our f32 precision.
         // 100ns resolution is plenty.

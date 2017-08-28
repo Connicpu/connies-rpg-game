@@ -1,6 +1,7 @@
 use tiled;
 
 use graphics;
+use physics as p;
 
 pub use tilemap::chunks::{Chunk, Chunks};
 pub use tilemap::layer::Layer;
@@ -16,6 +17,17 @@ pub struct Map {
 
     pub v_chunks: u32,
     pub h_chunks: u32,
+}
+
+impl Map {
+    pub fn create_physics(&self, layer: usize, physics: &mut p::World) {
+        let (hc, vc) = (self.h_chunks, self.v_chunks);
+        let coords = (0..hc).flat_map(|y| (0..vc).map(move |x| (x, y)));
+        for (chunk, (x, y)) in self.layers[layer].chunks.chunks.iter().zip(coords) {
+            let pos = [x as f32 * 8.0, y as f32 * -8.0];
+            chunk.build_physics(physics, &self.tilesets, pos);
+        }
+    }
 }
 
 pub struct MapBuilder<'a> {
