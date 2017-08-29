@@ -21,7 +21,7 @@ impl Camera {
         let camera_view_proj = Matrix4::from(graphics_cam.view) * Matrix4::from(graphics_cam.proj);
         let inverse_camera_view_proj = camera_view_proj.transpose().invert().unwrap();
 
-        let mut aabb = Aabb::new();
+        let mut aabb = Aabb::empty();
 
         for &point in CAMERA_BOUNDING_POINTS.iter() {
             let point = inverse_camera_view_proj.transform_point(point.clone());
