@@ -16,6 +16,8 @@ fn process(_: &mut PhysicsUpdate, entities: EntityIter, data: &mut DataHelper) {
         let transform = &mut data.components.transform[entity];
         transform.pos.x = body_pos.pos.x;
         transform.pos.y = body_pos.pos.y;
-        transform.rot = body_pos.rot.angle();
+        transform.rot.angle = body_pos.rot.angle();
+        transform.rot.sin = body_pos.rot.sin;
+        transform.rot.cos = body_pos.rot.cos;
     }
 }
