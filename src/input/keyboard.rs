@@ -37,7 +37,9 @@ impl KeyboardUpdate for KeyboardState {
     }
 
     fn key_pressed(&mut self, vk: VirtualKeyCode) {
-        self.pressed_keys.insert(vk);
+        if !self.held_keys.contains(&vk) {
+            self.pressed_keys.insert(vk);
+        }
         self.held_keys.insert(vk);
     }
 
