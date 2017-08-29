@@ -1,9 +1,11 @@
 use cgmath::Vector2;
 use cgmath::Matrix4;
 
-pub fn view(pos: Vector2<f32>, size: f32, rot: f32) -> Matrix4<f32> {
-    let cos = rot.cos();
-    let sin = rot.sin();
+use math::Rot;
+
+pub fn view(pos: Vector2<f32>, size: f32, rot: &Rot) -> Matrix4<f32> {
+    let cos = rot.cos;
+    let sin = rot.sin;
     let Vector2 { x, y } = pos;
 
     let m00 = cos / size;

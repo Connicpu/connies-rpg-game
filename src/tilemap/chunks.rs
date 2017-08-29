@@ -139,7 +139,7 @@ fn fixture_for_tile(
         if let Some(ref objectgroup) = tile.objectgroup {
             for object in objectgroup.objects.iter() {
                 use tiled::ObjectShape::*;
-                let (x, y) = (object.x / ts, object.y / ts);
+                let (x, y) = (object.x / ts, -object.y / ts);
                 match object.shape {
                     Rect { width, height } => {
                         let (w, h) = (width / ts, height / ts);
@@ -170,11 +170,11 @@ fn rect_fixture(ox: f32, oy: f32, x: f32, y: f32, w: f32, h: f32) -> [b2::Vec2; 
         },
         b2::Vec2 {
             x: ox + x + w,
-            y: oy + y + h,
+            y: oy + y - h,
         },
         b2::Vec2 {
             x: ox + x,
-            y: oy + y + h,
+            y: oy + y - h,
         },
     ]
 }
