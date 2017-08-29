@@ -40,6 +40,9 @@ pub mod physics;
 pub mod tilemap;
 pub mod timer;
 pub mod util;
+pub mod player;
+
+use player::Player;
 
 pub type World = conniecs::World<Systems>;
 pub type DataHelper = conniecs::DataHelper<Components, Services>;
@@ -54,11 +57,14 @@ pub struct Services {
     pub timer: timer::Timer,
     pub physics: physics::World,
     pub graphics: graphics::System,
+    
+    pub default_texture: Option<graphics::textures::TextureId>,
 
     pub camera: math::Camera,
     pub keyboard: input::KeyboardState,
 
     pub current_map: Option<tilemap::Map>,
+    pub player: Option<player::Player>
 }
 
 #[derive(ComponentManager)]
@@ -75,6 +81,8 @@ pub struct Components {
 pub struct Systems {
     pub update_time: timer::UpdateTime,
     pub update_input: input::UpdateInput,
+    
+    pub player_update: player::PlayerUpdate,
 
     pub physics_run: physics::PhysicsRun,
     pub physics_update: EntitySystem<physics::PhysicsUpdate>,
@@ -89,10 +97,32 @@ fn main() {
 
     let mut world = World::new();
     load_test_map(&mut world);
+    
+    world.data.services.default_texture = Some(world.data.services.graphics.load_texture("textures/default.png"));
+    
+    setup_player(&mut world);
 
     while !world.data.services.quit {
+        //player debug stuff:
+        /*match world.data.services.player
+        {
+            Some (ref player) => {
+                let body = world.data.services.physics.world.body(player.phys_body.handle);
+                let position = body.position ();
+                println! ( "player position: ({}, {})", position.x, position.y );
+            }
+            
+            None => (),
+        }*/
         world.update();
     }
+}
+
+fn setup_player(world: &mut conniecs::World<Systems>) {
+    let player_sprite = components::Sprite{sprite: world.data.services.default_texture.unwrap (), uv_rect: [0.0, 0.0, 1.0, 1.0]};
+    let player = Player::new(player_sprite, &mut world.data.services.physics, [9.0, -247.0], [0.5, 1.5], 1.0);
+    
+    world.data.services.player = Some(player);
 }
 
 fn load_test_map(world: &mut conniecs::World<Systems>) {
