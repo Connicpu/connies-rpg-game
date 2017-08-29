@@ -81,6 +81,7 @@ pub struct Systems {
 
     pub begin_frame: graphics::BeginFrame,
     pub temp_draw: graphics::TempDraw,
+    pub draw_sprites: EntitySystem<graphics::DrawSprites>,
     pub end_frame: graphics::EndFrame,
 }
 
@@ -102,4 +103,34 @@ fn load_test_map(world: &mut conniecs::World<Systems>) {
     map.create_physics(1, &mut world.data.services.physics);
 
     world.data.services.current_map = Some(map);
+
+    let _aymeric = world.data.create_entity(|e, c, s| {
+        use wrapped2d::b2;
+
+        let sprite = s.graphics.load_texture("textures/aymeric.png");
+        let sprite = components::Sprite::new(sprite);
+        let mut transform = components::Transform::new();
+        transform.pos.x = 4.0;
+        transform.pos.y = -248.0;
+
+        c.transform.add(e, transform);
+        c.sprite.add(e, sprite);
+
+        let def = b2::BodyDef {
+            body_type: b2::BodyType::Dynamic,
+            position: b2::Vec2 { x: 4.0, y: -248.0 },
+            angular_velocity: -10.0,
+            ..b2::BodyDef::new()
+        };
+        let body = s.physics.world.create_body(&def);
+
+        let shape = b2::CircleShape::new_with(b2::Vec2 { x: 0.0, y: 0.0 }, 0.5);
+        s.physics
+            .world
+            .body_mut(body)
+            .create_fast_fixture(&shape, 1.0);
+
+        let body = physics::Body { handle: body };
+        c.body.add(e, body);
+    });
 }

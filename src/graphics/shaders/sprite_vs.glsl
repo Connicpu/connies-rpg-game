@@ -15,7 +15,7 @@ uniform mat4 view;
 out vec2 v_uv;
 
 void main() {
-    vec2 vpos = (pos + center) * scale * rot + world_pos.xy;
+    vec2 vpos = (pos - center * vec2(1, -1)) * scale * rot + world_pos.xy;
     gl_Position = vec4(vpos, world_pos.z, 1.0) * view * proj;
     
     v_uv = mix(uv_rect.xy, uv_rect.zw, uv.xy);
