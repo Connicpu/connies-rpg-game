@@ -32,7 +32,7 @@ fn process(sys: &mut DrawSprites, entities: EntityIter, data: &mut DataHelper) {
             layer,
         } = sprite;
 
-        let (sin, cos) = (rot.sin(), rot.cos());
+        let (sin, cos) = (rot.sin, rot.cos);
 
         let instance = SpriteInstance {
             center,
