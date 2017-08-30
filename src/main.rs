@@ -80,7 +80,7 @@ pub struct Systems {
     pub physics_update: EntitySystem<physics::PhysicsUpdate>,
 
     pub begin_frame: graphics::BeginFrame,
-    pub temp_draw: graphics::TempDraw,
+    pub tile_draw: graphics::TileDraw,
     pub draw_sprites: EntitySystem<graphics::DrawSprites>,
     pub end_frame: graphics::EndFrame,
 }
