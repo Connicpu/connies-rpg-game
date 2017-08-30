@@ -2,7 +2,7 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    
+
     let target = env::var("TARGET").unwrap();
     let mut manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     manifest_dir.push("lib");
@@ -13,8 +13,7 @@ fn main() {
         if target.contains("msvc") {
             lib_dir.push("msvc");
             dll_dir.push("msvc");
-        }
-        else {
+        } else {
             lib_dir.push("gnu-mingw");
             dll_dir.push("gnu-mingw");
         }
@@ -23,12 +22,12 @@ fn main() {
     } else if target.contains("linux") {
         lib_dir.push("linux");
         dll_dir.push("linux");
-        
+
         (lib_dir, dll_dir)
-    } else if target.contains ( "darwin" ) {
-        lib_dir.push ( "darwin" );
-        dll_dir.push ( "darwin" );
-        
+    } else if target.contains("darwin") {
+        lib_dir.push("darwin");
+        dll_dir.push("darwin");
+
         (lib_dir, dll_dir)
     } else {
         return;
@@ -39,8 +38,7 @@ fn main() {
     if target.contains("x86_64") {
         lib_dir.push("64");
         dll_dir.push("64");
-    }
-    else {
+    } else {
         lib_dir.push("32");
         dll_dir.push("32");
     }
@@ -55,9 +53,11 @@ fn main() {
 
             if let Some(file_name) = file_name_result {
                 let file_name = file_name.to_str().unwrap();
-                if file_name.ends_with( ".dll" ) || file_name.ends_with( ".dylib" ) {
+                if file_name.ends_with(".dll") || file_name.ends_with(".dylib") {
                     new_file_path.push(file_name);
-                    std::fs::copy(&entry_path, new_file_path.as_path()).expect("Can't copy from DLL dir");
+                    std::fs::copy(&entry_path, new_file_path.as_path()).expect(
+                        "Can't copy from DLL dir",
+                    );
                 }
             }
         }

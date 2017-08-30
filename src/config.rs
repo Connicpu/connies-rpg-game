@@ -33,4 +33,3 @@ lazy_static! {
         toml::from_slice(&config_data).expect("TODO: fallback to default config")
     };
 }
-

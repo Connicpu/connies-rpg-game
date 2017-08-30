@@ -4,6 +4,4 @@ def_system! {
     pub struct MoveCamera;
 }
 
-fn process(data: &mut DataHelper) {
-    
-}
+fn process(data: &mut DataHelper) {}

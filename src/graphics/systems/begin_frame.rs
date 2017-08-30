@@ -18,6 +18,7 @@ fn process(_: &mut BeginFrame, data: &mut DataHelper) {
     data.services.graphics.current_frame = Some(frame);
 
     data.services.camera.aspect_ratio = width as f32 / height as f32;
-    data.services.graphics.set_camera(&data.services.camera.to_raw());
+    data.services
+        .graphics
+        .set_camera(&data.services.camera.to_raw());
 }
-

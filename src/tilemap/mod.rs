@@ -3,6 +3,10 @@ use tiled;
 use graphics;
 use physics as p;
 
+use conniecs::Entity;
+
+use wrapped2d::user_data::UserData;
+
 pub use tilemap::chunks::{Chunk, Chunks};
 pub use tilemap::layer::Layer;
 pub use tilemap::tilesets::Tilesets;
@@ -20,12 +24,16 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn create_physics(&self, layer: usize, physics: &mut p::World) {
+    pub fn create_physics(&self, layer: usize, physics: &mut p::World, ground_entity: Entity) {
         let (hc, vc) = (self.h_chunks, self.v_chunks);
         let coords = (0..hc).flat_map(|y| (0..vc).map(move |x| (x, y)));
         for (chunk, (x, y)) in self.layers[layer].chunks.chunks.iter().zip(coords) {
             let pos = [x as f32 * 8.0, y as f32 * -8.0];
-            chunk.build_physics(physics, &self.tilesets, pos);
+            let chunk_body_handle = chunk.build_physics(physics, &self.tilesets, pos);
+            physics
+                .world
+                .body_mut(chunk_body_handle)
+                .set_user_data(ground_entity);
         }
     }
 }
@@ -62,12 +70,14 @@ pub fn load_map(map: tiled::Map, graphics: &mut graphics::System) -> Map {
         builder.layers.push(layer);
     }
 
-    let MapBuilder { tilesets, layers, .. } = builder;
+    let MapBuilder {
+        tilesets, layers, ..
+    } = builder;
 
     Map {
         tilesets,
         layers,
-        
+
         v_chunks,
         h_chunks,
     }

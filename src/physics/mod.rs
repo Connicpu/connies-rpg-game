@@ -34,5 +34,5 @@ pub struct EntityUserData;
 impl wrapped2d::user_data::UserDataTypes for EntityUserData {
     type BodyData = Entity;
     type JointData = ();
-    type FixtureData = ();
+    type FixtureData = Entity;
 }
