@@ -40,7 +40,11 @@ fn trim_path(path: &Path) -> String {
 
     if any {
         if let Ok(stripped) = path.strip_prefix(&base) {
-            return format!("{}: {}", krate.to_string_lossy(), stripped.to_string_lossy());
+            return format!(
+                "{}: {}",
+                krate.to_string_lossy(),
+                stripped.to_string_lossy()
+            );
         }
     }
 
@@ -61,29 +65,27 @@ fn display_panic(info: &panic::PanicInfo) {
             frame
                 .symbols()
                 .iter()
-                .filter_map(|symbol| {
-                    match (
-                        symbol.name(),
-                        symbol.filename(),
-                        symbol.lineno(),
-                        symbol.addr(),
-                    ) {
-                        (Some(name), Some(file), Some(line), _) => Some(format!(
-                            "fn {}(...)\n    in '{}' at line {}",
-                            name,
-                            trim_path(file),
-                            line
-                        )),
-                        (None, Some(file), Some(line), _) => {
-                            Some(format!("fn in '{}' at line {}", trim_path(file), line))
-                        }
-                        (Some(name), Some(file), None, _) => {
-                            Some(format!("fn {}(...)\n    in '{}'", name, trim_path(file)))
-                        }
-                        (Some(name), None, None, _) => Some(format!("fn {}(...)", name)),
-                        (_, _, _, Some(addr)) => Some(format!("Unresolved symbol {:?}", addr)),
-                        _ => None,
+                .filter_map(|symbol| match (
+                    symbol.name(),
+                    symbol.filename(),
+                    symbol.lineno(),
+                    symbol.addr(),
+                ) {
+                    (Some(name), Some(file), Some(line), _) => Some(format!(
+                        "fn {}(...)\n    in '{}' at line {}",
+                        name,
+                        trim_path(file),
+                        line
+                    )),
+                    (None, Some(file), Some(line), _) => {
+                        Some(format!("fn in '{}' at line {}", trim_path(file), line))
                     }
+                    (Some(name), Some(file), None, _) => {
+                        Some(format!("fn {}(...)\n    in '{}'", name, trim_path(file)))
+                    }
+                    (Some(name), None, None, _) => Some(format!("fn {}(...)", name)),
+                    (_, _, _, Some(addr)) => Some(format!("Unresolved symbol {:?}", addr)),
+                    _ => None,
                 })
                 .collect::<Vec<_>>()
                 .into_iter()
@@ -92,7 +94,11 @@ fn display_panic(info: &panic::PanicInfo) {
         .join("\n");
 
     let locinfo = if let Some(loc) = info.location() {
-        format!("Panic occurred in '{}' at line {}", trim_path(Path::new(loc.file())), loc.line())
+        format!(
+            "Panic occurred in '{}' at line {}",
+            trim_path(Path::new(loc.file())),
+            loc.line()
+        )
     } else {
         "Panic ocurred at an unknown location".to_string()
     };

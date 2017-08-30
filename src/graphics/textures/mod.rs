@@ -32,7 +32,7 @@ impl TextureManager {
         if let Some(id) = self.name_to_id(asset) {
             return id;
         }
-        
+
         self.insert(asset, Texture::load_from_asset(display, asset))
     }
 

@@ -7,7 +7,9 @@ pub struct Tilesets {
 
 impl Tilesets {
     pub fn empty() -> Self {
-        Tilesets { tileset_descs: vec![] }
+        Tilesets {
+            tileset_descs: vec![],
+        }
     }
 
     pub fn build(builder: &mut MapBuilder) -> Self {
@@ -20,9 +22,7 @@ impl Tilesets {
             .map
             .tilesets
             .iter()
-            .map(|tileset| {
-                TilesetDesc::load(graphics, tileset.clone())
-            })
+            .map(|tileset| TilesetDesc::load(graphics, tileset.clone()))
             .collect();
 
         Tilesets { tileset_descs }
