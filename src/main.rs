@@ -1,5 +1,6 @@
 #![feature(inclusive_range_syntax, range_contains)]
 #![feature(get_type_id)]
+#![feature(conservative_impl_trait)]
 
 extern crate tiled;
 extern crate wrapped2d;
@@ -9,6 +10,7 @@ extern crate windows_dpi;
 extern crate image;
 extern crate msgbox;
 extern crate backtrace;
+extern crate fnv;
 
 #[macro_use]
 extern crate glium;
@@ -38,10 +40,11 @@ pub mod graphics;
 pub mod input;
 pub mod math;
 pub mod physics;
+pub mod player;
+pub mod systems;
 pub mod tilemap;
 pub mod timer;
 pub mod util;
-pub mod player;
 
 use std::sync::RwLock;
 use std::sync::Arc;
@@ -50,6 +53,7 @@ pub type World = conniecs::World<Systems>;
 pub type DataHelper = conniecs::DataHelper<Components, Services>;
 pub type ComponentList<T> = conniecs::ComponentList<Components, T>;
 pub type EntityIter<'a> = conniecs::EntityIter<'a, Components>;
+pub type EntityData<'a> = conniecs::EntityData<'a, Components>;
 
 #[derive(Default, ServiceManager)]
 pub struct Services {
@@ -66,8 +70,7 @@ pub struct Services {
     pub keyboard: input::KeyboardState,
 
     pub current_map: Option<tilemap::Map>,
-    pub player: Option<Entity>,
-    pub player_ground_detector: Option<Arc<RwLock<player::PlayerGroundDetector>>>,
+    pub player: Entity,
 }
 
 #[derive(ComponentManager)]
@@ -78,6 +81,9 @@ pub struct Components {
     pub sprite: ComponentList<components::Sprite>,
     #[hot]
     pub body: ComponentList<physics::Body>,
+
+    #[cold]
+    pub player: ComponentList<player::Player>,
 }
 
 #[derive(SystemManager)]
@@ -85,13 +91,17 @@ pub struct Systems {
     pub update_time: timer::UpdateTime,
     pub update_input: input::UpdateInput,
 
-    pub player_update: player::PlayerUpdate,
+    pub player_update: EntitySystem<player::PlayerUpdate>,
+    pub camera_follow: EntitySystem<systems::CameraFollow>,
 
     pub physics_run: physics::PhysicsRun,
     pub physics_update: EntitySystem<physics::PhysicsUpdate>,
 
+    pub sprite_watcher: EntitySystem<graphics::SpriteWatcher>,
+    pub lock_camera: input::LockCamera,
+
     pub begin_frame: graphics::BeginFrame,
-    pub temp_draw: graphics::TempDraw,
+    pub tile_draw: graphics::TileDraw,
     pub draw_sprites: EntitySystem<graphics::DrawSprites>,
     pub end_frame: graphics::EndFrame,
 }
@@ -115,7 +125,7 @@ fn main() {
     );
 
     let player = create_player(&mut world, player_ground_sensor_entity);
-    world.data.services.player = Some(player);
+    world.data.services.player = player;
 
     while !world.data.services.quit {
         world.update();
@@ -129,15 +139,15 @@ fn create_player(
     world.data.create_entity(|e, c, s| {
         let mut player_sprite = components::Sprite::new(s.default_texture.unwrap());
         player_sprite.center = [0.5, 1.0];
-        let player_body = player::Player::create_pysics(
+        let player_body = player::Player::create_physics(
             &mut s.physics,
             [9.0, -247.0],
-            [0.5, 1.5],
+            [0.5, 1.25],
             1.0,
             player_ground_sensor_entity,
         );
         let mut player_transform = components::Transform::new();
-        player_transform.size = cgmath::Vector2::<f32> { x: 0.5, y: 1.5 };
+        player_transform.size = cgmath::Vector2::<f32> { x: 0.5, y: 1.25 };
 
         c.sprite.add(e, player_sprite);
         c.transform.add(e, player_transform);
@@ -150,7 +160,11 @@ fn create_player(
         s.physics
             .world
             .set_contact_listener(Box::new(player_ground_detector_callbacks));
-        s.player_ground_detector = Some(player_ground_detector_arc);
+
+        let player = player::Player {
+            ground_detector: player_ground_detector_arc,
+        };
+        c.player.add(e, player);
     })
 }
 

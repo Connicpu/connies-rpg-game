@@ -14,17 +14,19 @@ use std::collections::VecDeque;
 use CONFIG;
 use graphics::quad_types::{QUAD_INDICES, QUAD_VERTICES};
 use graphics::tileset::{TileInstance, TilesetDesc};
+use graphics::scene::grid::UniformGrid;
 use tilemap;
 
 pub use graphics::quad_types::{Camera, QuadVertex, SpriteInstance};
 pub use graphics::textures::TextureId;
 pub use graphics::systems::all::*;
 
-pub mod quad_types;
+pub mod scene;
 pub mod shaders;
 pub mod systems;
 pub mod textures;
 pub mod tileset;
+pub mod quad_types;
 
 pub struct System {
     pub events_loop: Option<winit::EventsLoop>,
@@ -32,6 +34,7 @@ pub struct System {
     pub textures: textures::TextureManager,
     pub dpi: f32,
     pub current_frame: Option<glium::Frame>,
+    pub scene_grid: UniformGrid,
 
     quad_vertices: glium::VertexBuffer<QuadVertex>,
     quad_indices: glium::IndexBuffer<u32>,
@@ -66,6 +69,8 @@ impl System {
         let display = glium::Display::new(window_builder, gl_builder, &events_loop)
             .expect("Display creation failure");
 
+        let scene_grid = UniformGrid::new(8.0);
+
         let textures = textures::TextureManager::new();
 
         let quad_vertices = VertexBuffer::new(&display, &QUAD_VERTICES[..]).unwrap();
@@ -84,6 +89,7 @@ impl System {
             textures,
             dpi,
             current_frame: None,
+            scene_grid,
 
             quad_vertices,
             quad_indices,

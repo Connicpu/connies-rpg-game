@@ -43,12 +43,46 @@ impl IntAabb {
 
         self
     }
+
+    pub fn restricted(self, other: IntAabb) -> Self {
+        *self.clone().restrict(other)
+    }
+
+    pub fn restricted_min(mut self, x: i32, y: i32) -> Self {
+        self.min_x = max(self.min_x, x);
+        self.min_y = max(self.min_y, y);
+        self
+    }
+
+    pub fn restricted_max(mut self, x: i32, y: i32) -> Self {
+        self.max_x = min(self.max_x, x);
+        self.max_y = min(self.max_y, y);
+        self
+    }
+
+    pub fn expanded_by(mut self, x: i32, y: i32) -> Self {
+        self.min_x -= x;
+        self.min_y -= y;
+
+        self.max_x += x;
+        self.max_y += y;
+
+        self
+    }
 }
 
+#[derive(Copy, Clone)]
 pub struct IntAabbIter {
     aabb: IntAabb,
     y: i32,
     x: i32,
+}
+
+impl IntAabbIter {
+    pub fn to_u32(self) -> IntAabbUIter {
+        assert!(self.aabb.min_x >= 0 && self.aabb.min_y >= 0);
+        IntAabbUIter { inner: self }
+    }
 }
 
 impl IntoIterator for IntAabb {
@@ -81,5 +115,18 @@ impl Iterator for IntAabbIter {
         }
 
         Some(result)
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct IntAabbUIter {
+    inner: IntAabbIter,
+}
+
+impl Iterator for IntAabbUIter {
+    type Item = (u32, u32);
+
+    fn next(&mut self) -> Option<(u32, u32)> {
+        self.inner.next().map(|(x, y)| (x as u32, y as u32))
     }
 }

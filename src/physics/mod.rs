@@ -17,7 +17,7 @@ pub struct World {
 impl World {
     pub fn new() -> Self {
 
-        let world = b2::World::<EntityUserData>::new(&b2::Vec2 { x: 0.0, y: -9.8 });
+        let world = b2::World::<EntityUserData>::new(&b2::Vec2 { x: 0.0, y: -15.0 });
 
         World { world }
     }

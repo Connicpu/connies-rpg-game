@@ -102,10 +102,10 @@ impl Aabb {
     }
 
     pub fn scaled(self, scale: Vector2<f32>) -> Aabb {
-        Aabb {
-            min: self.min.mul_element_wise(scale),
-            max: self.max.mul_element_wise(scale),
-        }
+        let mut new = Aabb::empty();
+        new.expand_point(self.min.mul_element_wise(scale));
+        new.expand_point(self.max.mul_element_wise(scale));
+        new
     }
 
     pub fn to_int(self) -> IntAabb {
