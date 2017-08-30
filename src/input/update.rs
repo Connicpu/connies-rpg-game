@@ -15,26 +15,30 @@ fn process(_: &mut UpdateInput, data: &mut ::DataHelper) {
 
     // Handle input
     ev_loop.poll_events(|event| match event {
-        winit::Event::WindowEvent { event, .. } => match event {
-            Closed => data.services.quit = true,
+        winit::Event::WindowEvent { event, .. } => {
+            match event {
+                Closed => data.services.quit = true,
 
-            Focused(false) => {
-                println!("Focus lost");
-                data.services.keyboard.focus_lost();
-            }
+                Focused(false) => {
+                    println!("Focus lost");
+                    data.services.keyboard.focus_lost();
+                }
 
-            KeyboardInput { input, .. } => match (input.virtual_keycode, input.state) {
-                (Some(vk), ElementState::Pressed) => {
-                    data.services.keyboard.key_pressed(vk);
+                KeyboardInput { input, .. } => {
+                    match (input.virtual_keycode, input.state) {
+                        (Some(vk), ElementState::Pressed) => {
+                            data.services.keyboard.key_pressed(vk);
+                        }
+                        (Some(vk), ElementState::Released) => {
+                            data.services.keyboard.key_released(vk);
+                        }
+                        _ => (),
+                    }
                 }
-                (Some(vk), ElementState::Released) => {
-                    data.services.keyboard.key_released(vk);
-                }
+
                 _ => (),
-            },
-
-            _ => (),
-        },
+            }
+        }
         _ => (),
     });
 

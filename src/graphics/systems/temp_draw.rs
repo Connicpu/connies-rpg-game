@@ -27,9 +27,13 @@ fn process(_: &mut TempDraw, data: &mut DataHelper) {
                     (pos[1] > camera_aabb.min.y) &&
                     (pos[1] - 8.0 < camera_aabb.max.y)
                 {
-                    data.services
-                        .graphics
-                        .draw_tile_chunk(&mut frame, pos, layer.tint, chunk, &map.tilesets);
+                    data.services.graphics.draw_tile_chunk(
+                        &mut frame,
+                        pos,
+                        layer.tint,
+                        chunk,
+                        &map.tilesets,
+                    );
                 }
             }
         }

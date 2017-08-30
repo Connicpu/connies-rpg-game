@@ -7,7 +7,7 @@ use glium::index::PrimitiveType::TrianglesList;
 use glium::{Blend, Depth, DepthTest, DrawParameters, IndexBuffer, VertexBuffer};
 use glium::texture::SrgbTexture2d;
 use glium::framebuffer::SimpleFrameBuffer;
-use glium::uniforms::{MagnifySamplerFilter};
+use glium::uniforms::MagnifySamplerFilter;
 
 use std::collections::VecDeque;
 
@@ -72,7 +72,9 @@ impl System {
         let quad_indices = IndexBuffer::new(&display, TrianglesList, &QUAD_INDICES[..]).unwrap();
         let sprite_shader = shaders::load_sprite_shader(&display);
         let tile_shader = shaders::load_tile_shader(&display);
-        let tile_buffers = (0..1024).map(|_| Self::make_tile_buffer(&display)).collect();
+        let tile_buffers = (0..1024)
+            .map(|_| Self::make_tile_buffer(&display))
+            .collect();
 
         let fxaa_shader = shaders::load_fxaa_shader(&display);
 
@@ -108,8 +110,9 @@ impl System {
     ) where
         S: glium::Surface,
     {
-        let instance_buffer = glium::VertexBuffer::new(&self.display, instances)
-            .expect("instance buffer creation shouldn't fail");
+        let instance_buffer = glium::VertexBuffer::new(&self.display, instances).expect(
+            "instance buffer creation shouldn't fail",
+        );
         let tex = self.textures.get(texture);
         let sampler = tex.tex
             .sampled()
@@ -256,8 +259,11 @@ impl System {
     }
 
     fn make_tile_buffer(display: &glium::Display) -> VertexBuffer<TileInstance> {
-        VertexBuffer::empty_persistent(display, 64)
-            .unwrap_or_else(|_| VertexBuffer::empty_dynamic(display, 64).unwrap())
+        VertexBuffer::empty_persistent(display, 64).unwrap_or_else(
+            |_| {
+                VertexBuffer::empty_dynamic(display, 64).unwrap()
+            },
+        )
     }
 }
 

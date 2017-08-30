@@ -148,10 +148,12 @@ fn fixture_for_tile(
 
                         world.world.body_mut(body).create_fast_fixture(&shape, 1.0);
                     }
-                    ref shape => unimplemented!(
-                        "Unimplemented Tile ObjectShape in collision definition: {:?}",
-                        shape
-                    ),
+                    ref shape => {
+                        unimplemented!(
+                            "Unimplemented Tile ObjectShape in collision definition: {:?}",
+                            shape
+                        )
+                    }
                 }
             }
         }

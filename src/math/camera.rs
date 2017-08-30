@@ -25,7 +25,10 @@ impl Camera {
 
         for &point in CAMERA_BOUNDING_POINTS.iter() {
             let point = inverse_camera_view_proj.transform_point(point.clone());
-            aabb.expand_point(Vector2 { x: point.x, y: point.y });
+            aabb.expand_point(Vector2 {
+                x: point.x,
+                y: point.y,
+            });
         }
 
         aabb

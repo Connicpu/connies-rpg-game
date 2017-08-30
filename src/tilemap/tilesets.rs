@@ -20,9 +20,7 @@ impl Tilesets {
             .map
             .tilesets
             .iter()
-            .map(|tileset| {
-                TilesetDesc::load(graphics, tileset.clone())
-            })
+            .map(|tileset| TilesetDesc::load(graphics, tileset.clone()))
             .collect();
 
         Tilesets { tileset_descs }
