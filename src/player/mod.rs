@@ -48,25 +48,25 @@ impl dynamics::world::callbacks::ContactListener<EntityUserData> for PlayerGroun
         &mut self,
         contact: dynamics::world::callbacks::ContactAccess<EntityUserData>,
     ) {
-        println!("contact begin");
+        //println!("contact begin");
         let mut detector_write = self.detector.write().unwrap();
         if (*contact.fixture_a.user_data() == detector_write.player_ground_sensor_entity) ||
             (*contact.fixture_b.user_data() == detector_write.player_ground_sensor_entity)
         {
             detector_write.contact_count += 1;
             detector_write.grounded = true;
-            println!("contact_count: {}", detector_write.contact_count);
+            //println!("contact_count: {}", detector_write.contact_count);
         }
     }
     fn end_contact(&mut self, contact: dynamics::world::callbacks::ContactAccess<EntityUserData>) {
-        println!("contact end");
+        //println!("contact end");
         let mut detector_write = self.detector.write().unwrap();
         if (*contact.fixture_a.user_data() == detector_write.player_ground_sensor_entity) ||
             (*contact.fixture_b.user_data() == detector_write.player_ground_sensor_entity)
         {
             detector_write.contact_count -= 1;
             detector_write.grounded = detector_write.contact_count > 0;
-            println!("contact_count: {}", detector_write.contact_count);
+            //println!("contact_count: {}", detector_write.contact_count);
         }
     }
     fn pre_solve(
@@ -83,10 +83,12 @@ impl dynamics::world::callbacks::ContactListener<EntityUserData> for PlayerGroun
     }
 }
 
-pub struct Player;
+pub struct Player {
+    pub ground_detector: Arc<RwLock<PlayerGroundDetector>>,
+}
 
 impl Player {
-    pub fn create_pysics(
+    pub fn create_physics(
         world: &mut p::World,
         pos: [f32; 2],
         size: [f32; 2],
@@ -106,7 +108,7 @@ impl Player {
         let mut body_mut = world.world.body_mut(body_handle);
 
         let body_box_shape = b2::PolygonShape::new_oriented_box(
-            size[0] * 0.5,
+            size[0] * 0.49,
             (size[1] - size[0]) * 0.5,
             &b2::Vec2 {
                 x: 0.0,
@@ -128,7 +130,7 @@ impl Player {
             },
             size[0] * 0.5,
         );
-        let jump_sensor_shape = b2::PolygonShape::new_box(size[0] * 0.5, size[0] * 0.2);
+        let jump_sensor_shape = b2::PolygonShape::new_box(size[0] * 0.2, size[0] * 0.2);
 
         let mut jump_sensor_fixture_def = dynamics::fixture::FixtureDef::new();
         jump_sensor_fixture_def.density = density;

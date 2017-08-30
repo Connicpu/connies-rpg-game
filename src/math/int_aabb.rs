@@ -59,6 +59,16 @@ impl IntAabb {
         self.max_y = min(self.max_y, y);
         self
     }
+
+    pub fn expanded_by(mut self, x: i32, y: i32) -> Self {
+        self.min_x -= x;
+        self.min_y -= y;
+
+        self.max_x += x;
+        self.max_y += y;
+
+        self
+    }
 }
 
 #[derive(Copy, Clone)]

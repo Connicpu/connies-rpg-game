@@ -1,62 +1,82 @@
-use DataHelper;
+use wrapped2d::b2;
 
 extern crate winit;
 
-use wrapped2d::b2;
+use {DataHelper, EntityIter};
 
 #[derive(Default, System)]
+#[system_type(Entity)]
 #[process(process)]
+#[aspect(all(player, body))]
 pub struct PlayerUpdate;
 
-const PLAYER_MOVE_FORCE: f32 = 10.0;
-const PLAYER_JUMP_IMPULSE: f32 = 40.0;
+const MOVE_FORCE: f32 = 30.0;
+const JUMP_IMPULSE: f32 = 7.0;
+const AIR_CONTROL: f32 = 0.6;
+const MAX_X_VEL: f32 = 4.0;
+const SLOWDOWN: f32 = 5.0;
 
-fn process(_: &mut PlayerUpdate, data: &mut DataHelper) {
-    match data.services.player {
-        Some(player_entity) => {
-            data.with_entity_data(player_entity, |e, c, s| {
+fn process(_: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
+    for player in players {
+        let (c, s) = (&mut data.components, &mut data.services);
+        let ref jump_detector = c.player[player].ground_detector.read().unwrap();
 
-                let jump_detector = match s.player_ground_detector {
-                    Some(ref jump_detector_arc) => jump_detector_arc.read().unwrap(),
-                    None => return,
-                };
+        let move_modifier = if jump_detector.grounded {
+            1.0
+        } else {
+            AIR_CONTROL
+        };
 
-                let mut player_body = s.physics.world.body_mut(c.body[e].handle);
-                // LEFT
-                if s.keyboard.is_held(winit::VirtualKeyCode::A) {
-                    player_body.apply_force_to_center(
-                        &b2::Vec2 {
-                            x: -PLAYER_MOVE_FORCE,
-                            y: 0.0,
-                        },
-                        true,
-                    );
-                }
-                // RIGHT
-                if s.keyboard.is_held(winit::VirtualKeyCode::D) {
-                    player_body.apply_force_to_center(
-                        &b2::Vec2 {
-                            x: PLAYER_MOVE_FORCE,
-                            y: 0.0,
-                        },
-                        true,
-                    );
-                }
-                //JUMP
-                if s.keyboard.is_pressed(winit::VirtualKeyCode::Space) && jump_detector.grounded {
-                    let world_center = *player_body.world_center();
-                    player_body.apply_linear_impulse(
-                        &b2::Vec2 {
-                            x: 0.0,
-                            y: PLAYER_JUMP_IMPULSE,
-                        },
-                        &world_center,
-                        true,
-                    )
-                }
-            });
+        let mut body = s.physics.world.body_mut(c.body[player].handle);
+
+        let (left, right, jump) = (
+            s.keyboard.is_held(winit::VirtualKeyCode::A),
+            s.keyboard.is_held(winit::VirtualKeyCode::D),
+            s.keyboard.is_pressed(winit::VirtualKeyCode::Space),
+        );
+
+        if left {
+            body.apply_force_to_center(
+                &b2::Vec2 {
+                    x: -MOVE_FORCE * move_modifier,
+                    y: 0.0,
+                },
+                true,
+            );
         }
-        None => (),
-    }
 
+        if right {
+            body.apply_force_to_center(
+                &b2::Vec2 {
+                    x: MOVE_FORCE * move_modifier,
+                    y: 0.0,
+                },
+                true,
+            );
+        }
+
+        if jump && jump_detector.grounded {
+            let world_center = *body.world_center();
+            body.apply_linear_impulse(
+                &b2::Vec2 {
+                    x: 0.0,
+                    y: JUMP_IMPULSE,
+                },
+                &world_center,
+                true,
+            )
+        }
+
+        // Clamp x velocity
+        let mut velocity = *body.linear_velocity();
+        velocity.x = velocity.x.min(MAX_X_VEL).max(-MAX_X_VEL);
+
+        let dt = s.timer.delta_time;
+        if !left && !right {
+            let sign = velocity.x.signum();
+            velocity.x = (velocity.x.abs() - SLOWDOWN * dt * move_modifier).max(0.0) * sign;
+        }
+
+        body.set_linear_velocity(&velocity);
+    }
 }
