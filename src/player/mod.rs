@@ -37,7 +37,9 @@ pub struct PlayerGroundDetectorCallbacks {
 
 impl PlayerGroundDetectorCallbacks {
     pub fn new(detector: &Arc<RwLock<PlayerGroundDetector>>) -> Self {
-        PlayerGroundDetectorCallbacks { detector: detector.clone() }
+        PlayerGroundDetectorCallbacks {
+            detector: detector.clone(),
+        }
     }
 }
 
@@ -142,6 +144,8 @@ impl Player {
         );
         body_mut.set_rotation_fixed(true);
 
-        p::Body { handle: body_handle }
+        p::Body {
+            handle: body_handle,
+        }
     }
 }

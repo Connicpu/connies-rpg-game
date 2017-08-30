@@ -110,9 +110,8 @@ impl System {
     ) where
         S: glium::Surface,
     {
-        let instance_buffer = glium::VertexBuffer::new(&self.display, instances).expect(
-            "instance buffer creation shouldn't fail",
-        );
+        let instance_buffer = glium::VertexBuffer::new(&self.display, instances)
+            .expect("instance buffer creation shouldn't fail");
         let tex = self.textures.get(texture);
         let sampler = tex.tex
             .sampled()
@@ -259,11 +258,8 @@ impl System {
     }
 
     fn make_tile_buffer(display: &glium::Display) -> VertexBuffer<TileInstance> {
-        VertexBuffer::empty_persistent(display, 64).unwrap_or_else(
-            |_| {
-                VertexBuffer::empty_dynamic(display, 64).unwrap()
-            },
-        )
+        VertexBuffer::empty_persistent(display, 64)
+            .unwrap_or_else(|_| VertexBuffer::empty_dynamic(display, 64).unwrap())
     }
 }
 

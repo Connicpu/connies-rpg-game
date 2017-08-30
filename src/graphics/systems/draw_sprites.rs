@@ -50,11 +50,9 @@ fn process(sys: &mut DrawSprites, entities: EntityIter, data: &mut DataHelper) {
 
     let mut frame = data.services.graphics.current_frame.take().unwrap();
     for (&tex, instances) in instances.iter_mut() {
-        data.services.graphics.draw_sprites(
-            &mut frame,
-            instances,
-            tex,
-        );
+        data.services
+            .graphics
+            .draw_sprites(&mut frame, instances, tex);
         instances.clear();
     }
     data.services.graphics.current_frame = Some(frame);

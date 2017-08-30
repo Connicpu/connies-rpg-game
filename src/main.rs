@@ -106,9 +106,13 @@ fn main() {
 
     load_test_map(&mut world, ground_entity);
 
-    world.data.services.default_texture = Some(world.data.services.graphics.load_texture(
-        "textures/default.png",
-    ));
+    world.data.services.default_texture = Some(
+        world
+            .data
+            .services
+            .graphics
+            .load_texture("textures/default.png"),
+    );
 
     let player = create_player(&mut world, player_ground_sensor_entity);
     world.data.services.player = Some(player);
@@ -143,9 +147,9 @@ fn create_player(
         let player_ground_detector_arc = Arc::new(RwLock::new(player_ground_detector));
         let player_ground_detector_callbacks =
             player::PlayerGroundDetectorCallbacks::new(&player_ground_detector_arc);
-        s.physics.world.set_contact_listener(
-            Box::new(player_ground_detector_callbacks),
-        );
+        s.physics
+            .world
+            .set_contact_listener(Box::new(player_ground_detector_callbacks));
         s.player_ground_detector = Some(player_ground_detector_arc);
     })
 }
@@ -179,10 +183,10 @@ fn load_test_map(world: &mut conniecs::World<Systems>, ground_entity: Entity) {
         let body = s.physics.world.create_body(&def);
 
         let shape = b2::CircleShape::new_with(b2::Vec2 { x: 0.0, y: 0.0 }, 0.5);
-        s.physics.world.body_mut(body).create_fast_fixture(
-            &shape,
-            1.0,
-        );
+        s.physics
+            .world
+            .body_mut(body)
+            .create_fast_fixture(&shape, 1.0);
 
         let body = physics::Body { handle: body };
         c.body.add(e, body);

@@ -30,9 +30,10 @@ impl Map {
         for (chunk, (x, y)) in self.layers[layer].chunks.chunks.iter().zip(coords) {
             let pos = [x as f32 * 8.0, y as f32 * -8.0];
             let chunk_body_handle = chunk.build_physics(physics, &self.tilesets, pos);
-            physics.world.body_mut(chunk_body_handle).set_user_data(
-                ground_entity,
-            );
+            physics
+                .world
+                .body_mut(chunk_body_handle)
+                .set_user_data(ground_entity);
         }
     }
 }
@@ -69,7 +70,9 @@ pub fn load_map(map: tiled::Map, graphics: &mut graphics::System) -> Map {
         builder.layers.push(layer);
     }
 
-    let MapBuilder { tilesets, layers, .. } = builder;
+    let MapBuilder {
+        tilesets, layers, ..
+    } = builder;
 
     Map {
         tilesets,
