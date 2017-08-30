@@ -69,7 +69,7 @@ impl System {
         let display = glium::Display::new(window_builder, gl_builder, &events_loop)
             .expect("Display creation failure");
 
-        let scene_grid = UniformGrid::new(8.0);
+        let scene_grid = UniformGrid::new(4.0, 0);
 
         let textures = textures::TextureManager::new();
 
