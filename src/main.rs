@@ -102,7 +102,7 @@ pub struct Systems {
 
     pub begin_frame: graphics::BeginFrame,
     pub tile_draw: graphics::TileDraw,
-    pub draw_sprites: EntitySystem<graphics::DrawSprites>,
+    pub draw_sprites: graphics::DrawSprites,
     pub end_frame: graphics::EndFrame,
 }
 

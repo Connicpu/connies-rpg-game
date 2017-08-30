@@ -1,21 +1,20 @@
 use std::collections::HashMap;
 
-use {DataHelper, EntityIter};
+use DataHelper;
 use graphics::{SpriteInstance, TextureId};
 use components::{Sprite, Transform};
 
 #[derive(Default, System)]
-#[system_type(Entity)]
-#[aspect(all(transform, sprite))]
 #[process(process)]
 pub struct DrawSprites {
     instance_lists: HashMap<TextureId, Vec<SpriteInstance>>,
 }
 
-fn process(sys: &mut DrawSprites, entities: EntityIter, data: &mut DataHelper) {
+fn process(sys: &mut DrawSprites, data: &mut DataHelper) {
     let ref mut instances = sys.instance_lists;
 
-    for entity in entities {
+    let aabb = data.services.camera.aabb();
+    for entity in data.services.graphics.scene_grid.entities(aabb) {
         let transform = data.components.transform[entity];
         let sprite = data.components.sprite[entity];
 

@@ -5,7 +5,7 @@ dependencies = [
  "backtrace 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "cgmath 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "conniecs 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "conniecs-derive 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "conniecs-derive 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "fnv 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "glium 0.17.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glutin 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -203,7 +203,7 @@ name = "conniecs"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "conniecs-derive 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "conniecs-derive 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "fnv 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "index-pool 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.38 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -212,7 +212,7 @@ dependencies = [
 
 [[package]]
 name = "conniecs-derive"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "quote 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1261,7 +1261,7 @@ dependencies = [
 "checksum cocoa 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)" = "4047fed6536f40cc2ae5e7834fb38e382c788270191c4cd69196f89686d076ce"
 "checksum color_quant 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a475fc4af42d83d28adf72968d9bcfaf035a1a9381642d8e85d8a04957767b0d"
 "checksum conniecs 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "12aea885e7a34804db668d23b21dca1e62e84dab502ddb5f3f96d043844310aa"
-"checksum conniecs-derive 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8e43355ee18bd5c6d0ce2145ee4bf70e12df27694ce5c3676a06b3309225994c"
+"checksum conniecs-derive 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "06c6266855b1737771e9a17ccbec1dc707550a5bc73c08dd166f782f52c7b21b"
 "checksum conv 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "78ff10625fd0ac447827aa30ea8b861fead473bb60aeb73af6c1c58caf0d1299"
 "checksum core-foundation 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "f51ce3b8ebe311c56de14231eb57572c15abebd2d32b3bcb99bcdb9c101f5ac3"
 "checksum core-foundation 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "5909502e547762013619f4c4e01cc7393c20fe2d52d7fa471c1210adb2320dc7"
