@@ -27,7 +27,7 @@ impl Transform {
     }
 
     pub fn sprite_aabb(&self, center: Vector2<f32>) -> Aabb {
-        let mut aabb = Aabb::new();
+        let mut aabb = Aabb::empty();
 
         for vertex in &QUAD_VERTICES {
             let world_pt = self.transform_point(Vector2 {
