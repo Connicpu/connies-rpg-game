@@ -6,15 +6,15 @@ out vec4 color;
 uniform sampler2D tex;
 
 void texcoords(vec2 fragCoord, vec2 resolution,
-			out vec2 v_rgbNW, out vec2 v_rgbNE,
-			out vec2 v_rgbSW, out vec2 v_rgbSE,
-			out vec2 v_rgbM) {
-	vec2 inverseVP = 1.0 / resolution.xy;
-	v_rgbNW = (fragCoord + vec2(-1.0, -1.0)) * inverseVP;
-	v_rgbNE = (fragCoord + vec2(1.0, -1.0)) * inverseVP;
-	v_rgbSW = (fragCoord + vec2(-1.0, 1.0)) * inverseVP;
-	v_rgbSE = (fragCoord + vec2(1.0, 1.0)) * inverseVP;
-	v_rgbM = vec2(fragCoord * inverseVP);
+            out vec2 v_rgbNW, out vec2 v_rgbNE,
+            out vec2 v_rgbSW, out vec2 v_rgbSE,
+            out vec2 v_rgbM) {
+    vec2 inverseVP = 1.0 / resolution.xy;
+    v_rgbNW = (fragCoord + vec2(-1.0, -1.0)) * inverseVP;
+    v_rgbNE = (fragCoord + vec2(1.0, -1.0)) * inverseVP;
+    v_rgbSW = (fragCoord + vec2(-1.0, 1.0)) * inverseVP;
+    v_rgbSE = (fragCoord + vec2(1.0, 1.0)) * inverseVP;
+    v_rgbM = vec2(fragCoord * inverseVP);
 }
 
 #ifndef FXAA_REDUCE_MIN
@@ -76,17 +76,17 @@ vec4 fxaa(sampler2D tex, vec2 fragCoord, vec2 resolution,
 }
 
 vec4 apply(sampler2D tex, vec2 fragCoord, vec2 resolution) {
-	vec2 v_rgbNW;
-	vec2 v_rgbNE;
-	vec2 v_rgbSW;
-	vec2 v_rgbSE;
-	vec2 v_rgbM;
+    vec2 v_rgbNW;
+    vec2 v_rgbNE;
+    vec2 v_rgbSW;
+    vec2 v_rgbSE;
+    vec2 v_rgbM;
 
-	//compute the texture coords
-	texcoords(fragCoord, resolution, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
-	
-	//compute FXAA
-	return fxaa(tex, fragCoord, resolution, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
+    //compute the texture coords
+    texcoords(fragCoord, resolution, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
+    
+    //compute FXAA
+    return fxaa(tex, fragCoord, resolution, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
 }
 
 void main()
