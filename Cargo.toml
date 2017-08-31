@@ -6,7 +6,6 @@ version = "0.1.0"
 [dependencies]
 backtrace = "0.3.2"
 cgmath = "0.15.0"
-conniecs = "0.1.0"
 conniecs-derive = "0.1.1"
 fnv = "1.0.5"
 glium = "0.17.0"
@@ -21,6 +20,10 @@ toml = "0.4.5"
 windows_dpi = "0.1.4"
 winit = "0.7.5"
 wrapped2d = "0.3.4"
+
+[dependencies.conniecs]
+version = "0.1.1"
+features = ["coroutines"]
 
 [dependencies.msgbox]
 git = "https://github.com/bekker/msgbox-rs"
