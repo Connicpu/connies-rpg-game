@@ -93,6 +93,8 @@ impl Player {
         pos: [f32; 2],
         size: [f32; 2],
         density: f32,
+        restitution: f32,
+        friction: f32,
         player_ground_sensor_entity: Entity,
     ) -> p::Body {
         let body_desc = b2::BodyDef {
@@ -107,7 +109,7 @@ impl Player {
         let body_handle = world.world.create_body(&body_desc);
         let mut body_mut = world.world.body_mut(body_handle);
 
-        let body_box_shape = b2::PolygonShape::new_oriented_box(
+        /*let body_box_shape = b2::PolygonShape::new_oriented_box(
             size[0] * 0.49,
             (size[1] - size[0]) * 0.5,
             &b2::Vec2 {
@@ -129,16 +131,102 @@ impl Player {
                 y: size[1] - size[0] * 0.5,
             },
             size[0] * 0.5,
+        );*/
+        
+        let vertical_box_shape = b2::PolygonShape::new_oriented_box(
+            size[0] * 0.25,
+            size[1] * 0.48,
+            &b2::Vec2 {
+                x: 0.0,
+                y: size[1] * 0.5,
+            },
+            0.0
         );
+        let horizontal_box_shape = b2::PolygonShape::new_oriented_box(
+            size[0] * 0.48,
+            (size[1] - size[0]) * 0.5,
+            &b2::Vec2 {
+                x: 0.0,
+                y: size[1] * 0.5,
+            },
+            0.0
+        );
+        let bottom_left_cicle_shape = b2::CircleShape::new_with(
+            b2::Vec2 {
+                x: - 0.25 * size[0],
+                y: 0.25 * size[0],
+            },
+            size[0] * 0.25,
+        );
+        let bottom_right_cicle_shape = b2::CircleShape::new_with(
+            b2::Vec2 {
+                x: 0.25 * size[0],
+                y: 0.25 * size[0],
+            },
+            size[0] * 0.25,
+        );
+        let top_left_circle_shape = b2::CircleShape::new_with(
+            b2::Vec2 {
+                x: - 0.25 * size[0],
+                y: size[1] - 0.25 * size[0]
+            },
+            size[0] * 0.25
+        );
+        let top_right_circle_shape = b2::CircleShape::new_with(
+            b2::Vec2 {
+                x: 0.25 * size[0],
+                y: size[1] - 0.25 * size[0]
+            },
+            size[0] * 0.25
+        );
+        
+        let mut general_body_fixture_def = dynamics::fixture::FixtureDef::new();
+        
+        general_body_fixture_def.density = density;
+        general_body_fixture_def.restitution = restitution;
+        general_body_fixture_def.friction = friction;
+        
         let jump_sensor_shape = b2::PolygonShape::new_box(size[0] * 0.2, size[0] * 0.2);
 
         let mut jump_sensor_fixture_def = dynamics::fixture::FixtureDef::new();
         jump_sensor_fixture_def.density = density;
         jump_sensor_fixture_def.is_sensor = true;
-
-        body_mut.create_fast_fixture(&body_box_shape, density);
+        
+       /* body_mut.create_fast_fixture(&body_box_shape, density);
         body_mut.create_fast_fixture(&bottom_circle_shape, density);
-        body_mut.create_fast_fixture(&top_circle_shape, density);
+        body_mut.create_fast_fixture(&top_circle_shape, density);*/
+        
+        body_mut.create_fixture_with(
+            &vertical_box_shape,
+            &mut general_body_fixture_def,
+            Entity::nil()
+        );
+        body_mut.create_fixture_with(
+            &horizontal_box_shape,
+            &mut general_body_fixture_def,
+            Entity::nil()
+        );
+        body_mut.create_fixture_with(
+            &bottom_left_cicle_shape,
+            &mut general_body_fixture_def,
+            Entity::nil()
+        );
+        body_mut.create_fixture_with(
+            &bottom_right_cicle_shape,
+            &mut general_body_fixture_def,
+            Entity::nil()
+        );
+        body_mut.create_fixture_with(
+            &top_left_circle_shape,
+            &mut general_body_fixture_def,
+            Entity::nil()
+        );
+        body_mut.create_fixture_with(
+            &top_right_circle_shape,
+            &mut general_body_fixture_def,
+            Entity::nil()
+        );
+        
         body_mut.create_fixture_with(
             &jump_sensor_shape,
             &mut jump_sensor_fixture_def,
