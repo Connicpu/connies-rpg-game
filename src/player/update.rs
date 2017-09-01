@@ -17,7 +17,7 @@ const DECEL_TIME: f32 = 0.2;
 const TARGET_VELOCITY: f32 = 4.5;
 const AIR_CONTROL_ACCEL: f32 = 0.3;
 const AIR_CONTROL_DECEL: f32 = 0.2;
-const JUMP_HEIGHT: f32 = 3.0;
+const JUMP_HEIGHT: f32 = 2.3;
 
 fn process(_: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
     for player in players {

@@ -1,8 +1,9 @@
+#![feature(cfg_target_feature)]
+
 use std::env;
 use std::path::PathBuf;
 
 fn main() {
-
     let target = env::var("TARGET").unwrap();
     let mut manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     manifest_dir.push("lib");
@@ -13,6 +14,13 @@ fn main() {
         if target.contains("msvc") {
             lib_dir.push("msvc");
             dll_dir.push("msvc");
+
+            #[cfg(not(target_feature = "crt-static"))] {
+                lib_dir.push("md");
+            }
+            #[cfg(target_feature = "crt-static")] {
+                lib_dir.push("mt");
+            }
         } else {
             lib_dir.push("gnu-mingw");
             dll_dir.push("gnu-mingw");

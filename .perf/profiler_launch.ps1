@@ -1,5 +1,9 @@
 Enable-VSPrompt 14
 
+if (Test-Path ".perf\perfreport.vspx") {
+    Remove-Item ".perf\perfreport.vspx"
+}
+
 try
 {
     Start-Process VSPerf -Verb RunAs -ArgumentList "/launch:target\release\connies-rpg-game.exe /file:.perf\perfreport.vspx"
