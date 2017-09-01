@@ -101,6 +101,7 @@ pub struct Systems {
     pub begin_frame: graphics::BeginFrame,
     pub tile_draw: graphics::TileDraw,
     pub draw_sprites: graphics::DrawSprites,
+    pub draw_physics: graphics::box2d::DrawPhysics,
     pub end_frame: graphics::EndFrame,
 }
 

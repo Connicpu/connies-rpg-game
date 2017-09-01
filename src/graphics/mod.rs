@@ -21,6 +21,7 @@ pub use graphics::quad_types::{Camera, QuadVertex, SpriteInstance};
 pub use graphics::textures::TextureId;
 pub use graphics::systems::all::*;
 
+pub mod box2d;
 pub mod scene;
 pub mod shaders;
 pub mod systems;
@@ -46,7 +47,8 @@ pub struct System {
     fxaa_buffer: Option<SrgbTexture2d>,
 
     camera: Camera,
-    
+
+    debugdraw: box2d::DebugDraw,
     pub draw_count: usize,
 }
 
@@ -85,6 +87,8 @@ impl System {
 
         let fxaa_shader = shaders::load_fxaa_shader(&display);
 
+        let debugdraw = box2d::DebugDraw::new(&display);
+
         System {
             events_loop: Some(events_loop),
             display,
@@ -103,8 +107,9 @@ impl System {
             fxaa_buffer: None,
 
             camera: Default::default(),
-            
-            draw_count: 0
+
+            debugdraw,
+            draw_count: 0,
         }
     }
 
