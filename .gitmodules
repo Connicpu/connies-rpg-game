@@ -1,3 +1,6 @@
 [submodule "lib"]
 	path = lib
 	url = https://github.com/Connicpu/connies-rpg-game-libs
+[submodule "resources"]
+	path = resources
+	url = https://github.com/Connicpu/connies-rpg-game-resources.git
