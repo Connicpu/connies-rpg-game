@@ -46,6 +46,8 @@ pub struct System {
     fxaa_buffer: Option<SrgbTexture2d>,
 
     camera: Camera,
+    
+    pub draw_count: usize,
 }
 
 impl System {
@@ -101,6 +103,8 @@ impl System {
             fxaa_buffer: None,
 
             camera: Default::default(),
+            
+            draw_count: 0
         }
     }
 
@@ -147,6 +151,8 @@ impl System {
                 },
             )
             .expect("draw shouldn't fail");
+        
+        self.draw_count += 1;
     }
 
     pub fn draw_tiles<S>(
@@ -198,6 +204,8 @@ impl System {
                 },
             )
             .expect("draw shouldn't fail");
+            
+        self.draw_count += 1;
 
         self.tile_buffers.push_back(tile_buffer);
     }
@@ -237,6 +245,8 @@ impl System {
                 &Default::default(),
             )
             .unwrap();
+            
+        self.draw_count += 1;
     }
 
     pub fn load_texture(&mut self, asset: &str) -> TextureId {
