@@ -1,29 +1,31 @@
 #![feature(inclusive_range_syntax, range_contains)]
 #![feature(get_type_id)]
 #![feature(conservative_impl_trait)]
+#![feature(generators)]
 
-extern crate tiled;
-extern crate wrapped2d;
-extern crate time;
+extern crate backtrace;
 extern crate cgmath;
-extern crate windows_dpi;
+extern crate fnv;
 extern crate image;
 extern crate msgbox;
-extern crate backtrace;
-extern crate fnv;
+extern crate tiled;
+extern crate time;
+extern crate windows_dpi;
+extern crate wrapped2d;
 
 #[macro_use]
 extern crate glium;
 extern crate glutin;
 extern crate winit;
 
+extern crate conniecs;
 #[macro_use]
 extern crate conniecs_derive;
-extern crate conniecs;
 
 #[macro_use]
 extern crate serde_derive;
 //extern crate serde;
+
 extern crate toml;
 
 #[macro_use]
@@ -75,15 +77,11 @@ pub struct Services {
 
 #[derive(ComponentManager)]
 pub struct Components {
-    #[hot]
-    pub transform: ComponentList<components::Transform>,
-    #[hot]
-    pub sprite: ComponentList<components::Sprite>,
-    #[hot]
-    pub body: ComponentList<physics::Body>,
+    #[hot] pub transform: ComponentList<components::Transform>,
+    #[hot] pub sprite: ComponentList<components::Sprite>,
+    #[hot] pub body: ComponentList<physics::Body>,
 
-    #[cold]
-    pub player: ComponentList<player::Player>,
+    #[cold] pub player: ComponentList<player::Player>,
 }
 
 #[derive(SystemManager)]
