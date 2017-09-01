@@ -4,6 +4,8 @@ extern crate winit;
 
 use {DataHelper, EntityIter};
 
+use physics;
+
 #[derive(Default, System)]
 #[system_type(Entity)]
 #[process(process)]
@@ -15,7 +17,7 @@ const DECEL_TIME: f32 = 0.3;
 const TARGET_VELOCITY: f32 = 6.0;
 const AIR_CONTROL_ACCEL: f32 = 0.4;
 const AIR_CONTROL_DECEL: f32 = 0.2;
-const JUMP_IMPULSE: f32 = 9.0;
+const JUMP_HEIGHT: f32 = 3.0;
 
 fn process(_: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
     for player in players {
@@ -77,10 +79,11 @@ fn process(_: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
 
         if jump && jump_detector.grounded {
             let world_center = *body.world_center();
+            let impulse = (-2.0 * physics::GRAVITY.y * JUMP_HEIGHT).sqrt() * body_mass;
             body.apply_linear_impulse(
                 &b2::Vec2 {
                     x: 0.0,
-                    y: JUMP_IMPULSE,
+                    y: impulse,
                 },
                 &world_center,
                 true,
