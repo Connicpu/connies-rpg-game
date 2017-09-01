@@ -87,6 +87,15 @@ impl Aabb {
         self.relation_to(other) == AabbRelation::ContainedBy
     }
 
+    pub fn contains_point(&self, point: Vector2<f32>) -> bool {
+        point.x >= self.min.x && point.x <= self.max.x && point.y >= self.min.y &&
+            point.y <= self.max.y
+    }
+
+    pub fn contains_point_xy(&self, x: f32, y: f32) -> bool {
+        self.contains_point(Vector2 { x, y })
+    }
+
     pub fn expand(&mut self, aabb: Aabb) -> &mut Self {
         self.expand_point(aabb.min).expand_point(aabb.max)
     }

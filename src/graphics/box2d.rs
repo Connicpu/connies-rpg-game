@@ -6,12 +6,14 @@ use std::f32;
 
 use DataHelper;
 use graphics::Camera;
+use math::Aabb;
 
 pub struct DebugDraw {
     display: Display,
     line_vertices: Vec<DebugVertex>,
     vertex_buffer: VertexBuffer<DebugVertex>,
     debug_shader: Program,
+    aabb: Aabb,
 }
 
 impl DebugDraw {
@@ -27,6 +29,7 @@ impl DebugDraw {
                     fragment: include_str!("shaders/debugdraw_fs.glsl"),
                 }
             ).unwrap(),
+            aabb: Aabb::empty(),
         }
     }
 
@@ -60,6 +63,10 @@ impl DebugDraw {
     }
 
     fn add_line(&mut self, p0: &b2::Vec2, p1: &b2::Vec2, color: &b2::Color) {
+        if !self.aabb.contains_point_xy(p0.x, p0.y) && !self.aabb.contains_point_xy(p1.x, p1.y) {
+            return;
+        }
+
         self.line_vertices.push(DebugVertex {
             pos: [p0.x, p0.y],
             color: [color.r, color.g, color.b],
@@ -166,7 +173,10 @@ pub struct DrawPhysics {
 }
 
 fn draw_physics(draw: &mut DrawPhysics, data: &mut DataHelper) {
-    if data.services.keyboard.is_pressed(::winit::VirtualKeyCode::F9) {
+    if data.services
+        .keyboard
+        .is_pressed(::winit::VirtualKeyCode::F9)
+    {
         draw.enabled = !draw.enabled;
     }
 
@@ -176,6 +186,8 @@ fn draw_physics(draw: &mut DrawPhysics, data: &mut DataHelper) {
 
     let ref mut p = data.services.physics;
     let ref mut dd = data.services.graphics.debugdraw;
+
+    dd.aabb = data.services.camera.aabb();
 
     let flags = b2::DRAW_SHAPE | b2::DRAW_JOINT | b2::DRAW_CENTER_OF_MASS;
     p.world.draw_debug_data(dd, flags);
