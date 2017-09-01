@@ -142,6 +142,8 @@ fn create_player(
             [9.0, -247.0],
             [0.5, 1.25],
             1.0,
+            0.0,
+            0.05,
             player_ground_sensor_entity,
         );
         let mut player_transform = components::Transform::new();
