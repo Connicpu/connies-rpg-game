@@ -10,6 +10,8 @@ pub mod body;
 pub mod run;
 pub mod update;
 
+pub const GRAVITY:b2::Vec2 = b2::Vec2{ x: 0.0, y: -15.0 };
+
 pub struct World {
     pub world: b2::World<EntityUserData>,
 }
@@ -17,7 +19,7 @@ pub struct World {
 impl World {
     pub fn new() -> Self {
 
-        let world = b2::World::<EntityUserData>::new(&b2::Vec2 { x: 0.0, y: -15.0 });
+        let world = b2::World::<EntityUserData>::new(&GRAVITY);
 
         World { world }
     }
