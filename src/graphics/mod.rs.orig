@@ -47,9 +47,13 @@ pub struct System {
     fxaa_buffer: Option<SrgbTexture2d>,
 
     camera: Camera,
+<<<<<<< HEAD
 
     debugdraw: box2d::DebugDraw,
+=======
+    
     pub draw_count: usize,
+>>>>>>> origin/master
 }
 
 impl System {
@@ -107,9 +111,13 @@ impl System {
             fxaa_buffer: None,
 
             camera: Default::default(),
+<<<<<<< HEAD
 
             debugdraw,
-            draw_count: 0,
+=======
+            
+            draw_count: 0
+>>>>>>> origin/master
         }
     }
 

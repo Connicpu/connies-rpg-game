@@ -42,6 +42,6 @@ fn process(_: &mut TileDraw, data: &mut DataHelper) {
                 .draw_tile_chunk(&mut frame, pos, layer.tint, chunk, &map.tilesets);
         }
     }
-
+    
     data.services.graphics.current_frame = Some(frame);
 }
