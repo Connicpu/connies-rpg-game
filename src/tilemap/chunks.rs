@@ -148,6 +148,21 @@ fn fixture_for_tile(
 
                         world.world.body_mut(body).create_fast_fixture(&shape, 1.0);
                     }
+                    Polygon { ref points } => {
+                        let verts = points
+                            .iter()
+                            .map(|&(px, py)| {
+                                let (px, py) = (px / ts, py / ts);
+                                b2::Vec2 {
+                                    x: ox + x + px,
+                                    y: oy + y - py,
+                                }
+                            })
+                            .collect::<Vec<_>>();
+                        let shape = b2::PolygonShape::new_with(&verts);
+
+                        world.world.body_mut(body).create_fast_fixture(&shape, 1.0);
+                    }
                     ref shape => unimplemented!(
                         "Unimplemented Tile ObjectShape in collision definition: {:?}",
                         shape

@@ -1,7 +1,6 @@
 #![feature(inclusive_range_syntax, range_contains)]
 #![feature(get_type_id)]
 #![feature(conservative_impl_trait)]
-#![feature(generators)]
 
 extern crate backtrace;
 extern crate cgmath;
@@ -109,11 +108,37 @@ fn main() {
     util::panic_handler::init();
 
     let mut world = World::new();
+    load_test_zone(&mut world);
 
+    while !world.data.services.quit {
+        world.update();
+
+        if world
+            .data
+            .services
+            .keyboard
+            .is_pressed(winit::VirtualKeyCode::Escape)
+        {
+            world.wipe();
+            world.data.services.physics = Default::default();
+            world.data.services.current_map = None;
+
+            load_test_zone(&mut world);
+        }
+    }
+}
+
+fn load_test_zone(world: &mut World) {
     let ground_entity = world.data.create_entity(|_, _, _| {});
     let player_ground_sensor_entity = world.data.create_entity(|_, _, _| {});
 
-    load_test_map(&mut world, ground_entity);
+    load_test_map(world, ground_entity);
+
+    for i in 0..3 {
+        create_scion(world, 3.0 + i as f32, -248.0, Scion::Aymeric);
+        create_scion(world, 3.0 + i as f32, -248.5, Scion::Papalymo);
+        create_scion(world, 3.0 + i as f32, -249.0, Scion::Yda);
+    }
 
     world.data.services.default_texture = Some(
         world
@@ -123,12 +148,8 @@ fn main() {
             .load_texture("textures/default.png"),
     );
 
-    let player = create_player(&mut world, player_ground_sensor_entity);
+    let player = create_player(world, player_ground_sensor_entity);
     world.data.services.player = player;
-
-    while !world.data.services.quit {
-        world.update();
-    }
 }
 
 fn create_player(
@@ -142,7 +163,7 @@ fn create_player(
             &mut s.physics,
             [9.0, -247.0],
             [0.5, 1.25],
-            1.0,
+            5.0,
             0.0,
             0.05,
             player_ground_sensor_entity,
@@ -169,35 +190,49 @@ fn create_player(
     })
 }
 
-fn load_test_map(world: &mut conniecs::World<Systems>, ground_entity: Entity) {
+fn load_test_map(world: &mut World, ground_entity: Entity) {
     let tmap = tiled::parse_file(std::path::Path::new("resources/maps/testmap.tmx")).unwrap();
     let map = tilemap::load_map(tmap, &mut world.data.services.graphics);
 
     map.create_physics(1, &mut world.data.services.physics, ground_entity);
 
     world.data.services.current_map = Some(map);
+}
 
-    let _aymeric = world.data.create_entity(|e, c, s| {
+enum Scion {
+    Aymeric,
+    Papalymo,
+    Yda,
+}
+
+fn create_scion(world: &mut World, x: f32, y: f32, scion: Scion) {
+    world.data.create_entity(|e, c, s| {
         use wrapped2d::b2;
 
-        let sprite = s.graphics.load_texture("textures/aymeric.png");
+        let texture = match scion {
+            Scion::Aymeric => "textures/aymeric.png",
+            Scion::Papalymo => "textures/papalymo.png",
+            Scion::Yda => "textures/yda.png",
+        };
+
+        let sprite = s.graphics.load_texture(texture);
         let sprite = components::Sprite::new(sprite);
         let mut transform = components::Transform::new();
-        transform.pos.x = 4.0;
-        transform.pos.y = -248.0;
+        transform.pos.x = x;
+        transform.pos.y = y;
 
         c.transform.add(e, transform);
         c.sprite.add(e, sprite);
 
         let def = b2::BodyDef {
             body_type: b2::BodyType::Dynamic,
-            position: b2::Vec2 { x: 4.0, y: -248.0 },
+            position: b2::Vec2 { x, y },
             angular_velocity: -10.0,
             ..b2::BodyDef::new()
         };
         let body = s.physics.world.create_body(&def);
 
-        let shape = b2::CircleShape::new_with(b2::Vec2 { x: 0.0, y: 0.0 }, 0.5);
+        let shape = b2::CircleShape::new_with(b2::Vec2 { x: 0.0, y: 0.0 }, 0.48);
         s.physics
             .world
             .body_mut(body)

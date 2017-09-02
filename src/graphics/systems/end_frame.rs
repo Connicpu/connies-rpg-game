@@ -15,11 +15,11 @@ fn process(_: &mut EndFrame, data: &mut DataHelper) {
         f.finish().unwrap()
     });
 
-    println!(
+    /*println!(
         "draw count: {} ({} tile chunk layers)",
         data.services.graphics.draw_count,
         data.services.graphics.tile_draw_count
-    );
+    );*/
 
     data.services.graphics.draw_count = 0;
     data.services.graphics.tile_draw_count = 0;

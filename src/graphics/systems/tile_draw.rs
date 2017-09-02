@@ -15,15 +15,12 @@ const CHUNK_SCALE: Vector2<f32> = Vector2 {
 };
 
 fn process(_: &mut TileDraw, data: &mut DataHelper) {
-    let mut frame = data.services.graphics.current_frame.take().unwrap();
-
     let map: &Map = match data.services.current_map {
         Some(ref map) => map,
         None => return,
     };
 
     let camera_aabb = data.services.camera.aabb();
-
     let chunk_range = camera_aabb
         .scaled(CHUNK_SCALE)
         .to_int()
@@ -31,6 +28,8 @@ fn process(_: &mut TileDraw, data: &mut DataHelper) {
         .restricted_max(map.h_chunks as i32 - 1, map.v_chunks as i32 - 1)
         .into_iter()
         .to_u32();
+
+    let mut frame = data.services.graphics.current_frame.take().unwrap();
 
     for i in 0..map.layers.len() {
         let layer = &map.layers[i];
