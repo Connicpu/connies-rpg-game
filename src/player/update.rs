@@ -1,10 +1,8 @@
-use wrapped2d::b2;
-
-extern crate winit;
+use winit;
 
 use {DataHelper, EntityIter};
-
-use physics;
+use physics as p;
+use physics::ext::BodyExt;
 
 #[derive(Default, System)]
 #[system_type(Entity)]
@@ -52,13 +50,7 @@ fn process(_: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
                 new_force = -(TARGET_VELOCITY + body_velocity.x) * body_mass / dt;
             }
 
-            body.apply_force_to_center(
-                &b2::Vec2 {
-                    x: new_force,
-                    y: 0.0,
-                },
-                true,
-            );
+            body.apply_horiz_accel(new_force);
         }
 
         if right {
@@ -68,26 +60,12 @@ fn process(_: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
                 new_force = (TARGET_VELOCITY - body_velocity.x) * body_mass / dt;
             }
 
-            body.apply_force_to_center(
-                &b2::Vec2 {
-                    x: new_force,
-                    y: 0.0,
-                },
-                true,
-            );
+            body.apply_horiz_accel(new_force);
         }
 
         if jump && jump_detector.grounded {
-            let world_center = *body.world_center();
-            let impulse = (-2.0 * physics::GRAVITY.y * JUMP_HEIGHT).sqrt() * body_mass;
-            body.apply_linear_impulse(
-                &b2::Vec2 {
-                    x: 0.0,
-                    y: impulse,
-                },
-                &world_center,
-                true,
-            )
+            let impulse = (-2.0 * p::GRAVITY.y * JUMP_HEIGHT).sqrt() * body_mass;
+            body.apply_vert_impulse(impulse);
         }
 
         if !left && !right {
@@ -98,13 +76,7 @@ fn process(_: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
                 new_force = -body_velocity.x * body_mass / dt;
             }
 
-            body.apply_force_to_center(
-                &b2::Vec2 {
-                    x: new_force,
-                    y: 0.0,
-                },
-                true,
-            );
+            body.apply_horiz_accel(new_force);
         }
     }
 }
