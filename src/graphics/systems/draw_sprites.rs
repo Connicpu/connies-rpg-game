@@ -49,6 +49,10 @@ fn process(sys: &mut DrawSprites, data: &mut DataHelper) {
 
     let mut frame = data.services.graphics.current_frame.take().unwrap();
     for (&tex, instances) in instances.iter_mut() {
+        if instances.is_empty() {
+            continue;
+        }
+        
         data.services
             .graphics
             .draw_sprites(&mut frame, instances, tex);

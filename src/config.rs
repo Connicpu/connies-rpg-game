@@ -13,6 +13,7 @@ pub struct Graphics {
     pub vsync: bool,
     pub fullscreen: bool,
     pub max_fps: u32,
+    pub fxaa: bool,
 }
 
 impl Default for Graphics {
@@ -21,6 +22,7 @@ impl Default for Graphics {
             vsync: false,
             fullscreen: false,
             max_fps: 120,
+            fxaa: false,
         }
     }
 }

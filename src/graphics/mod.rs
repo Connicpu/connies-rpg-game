@@ -29,6 +29,8 @@ pub mod textures;
 pub mod tileset;
 pub mod quad_types;
 
+const SPRITE_BUFFER_SIZE: usize = 32;
+
 pub struct System {
     pub events_loop: Option<winit::EventsLoop>,
     pub display: glium::Display,
@@ -40,6 +42,7 @@ pub struct System {
     quad_vertices: glium::VertexBuffer<QuadVertex>,
     quad_indices: glium::IndexBuffer<u32>,
     sprite_shader: glium::Program,
+    sprite_buffers: VecDeque<VertexBuffer<SpriteInstance>>,
     tile_shader: glium::Program,
     tile_buffers: VecDeque<VertexBuffer<TileInstance>>,
 
@@ -49,7 +52,9 @@ pub struct System {
     camera: Camera,
 
     debugdraw: box2d::DebugDraw,
+
     pub draw_count: usize,
+    pub tile_draw_count: usize,
 }
 
 impl System {
@@ -80,10 +85,11 @@ impl System {
         let quad_vertices = VertexBuffer::new(&display, &QUAD_VERTICES[..]).unwrap();
         let quad_indices = IndexBuffer::new(&display, TrianglesList, &QUAD_INDICES[..]).unwrap();
         let sprite_shader = shaders::load_sprite_shader(&display);
-        let tile_shader = shaders::load_tile_shader(&display);
-        let tile_buffers = (0..1024)
-            .map(|_| Self::make_tile_buffer(&display))
+        let sprite_buffers = (0..32)
+            .map(|_| Self::make_sprite_buffer(&display))
             .collect();
+        let tile_shader = shaders::load_tile_shader(&display);
+        let tile_buffers = (0..32).map(|_| Self::make_tile_buffer(&display)).collect();
 
         let fxaa_shader = shaders::load_fxaa_shader(&display);
 
@@ -100,6 +106,7 @@ impl System {
             quad_vertices,
             quad_indices,
             sprite_shader,
+            sprite_buffers,
             tile_shader,
             tile_buffers,
 
@@ -109,7 +116,9 @@ impl System {
             camera: Default::default(),
 
             debugdraw,
+
             draw_count: 0,
+            tile_draw_count: 0,
         }
     }
 
@@ -125,39 +134,59 @@ impl System {
     ) where
         S: glium::Surface,
     {
-        let instance_buffer = glium::VertexBuffer::new(&self.display, instances)
-            .expect("instance buffer creation shouldn't fail");
-        let tex = self.textures.get(texture);
-        let sampler = tex.tex
-            .sampled()
-            .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest)
-            .minify_filter(glium::uniforms::MinifySamplerFilter::Linear);
+        let use_sbuffer = instances.len() <= SPRITE_BUFFER_SIZE;
 
-        let instances = instance_buffer.per_instance().unwrap();
+        let base_instance_buffer = if use_sbuffer {
+            self.sprite_buffers.pop_front().unwrap()
+        } else {
+            glium::VertexBuffer::immutable(&self.display, instances)
+                .expect("instance buffer creation shouldn't fail")
+        };
 
-        surface
-            .draw(
-                (&self.quad_vertices, instances),
-                &self.quad_indices,
-                &self.sprite_shader,
-                &uniform! {
-                    tex: sampler,
-                    proj: self.camera.proj,
-                    view: self.camera.view,
-                },
-                &DrawParameters {
-                    blend: Blend::alpha_blending(),
-                    depth: Depth {
-                        test: DepthTest::IfMoreOrEqual,
-                        write: true,
+        {
+            let instance_buffer = if use_sbuffer {
+                let buf = base_instance_buffer.slice(..instances.len()).unwrap();
+
+                buf.write(instances);
+                buf
+            } else {
+                base_instance_buffer.slice(..).unwrap()
+            };
+
+            let tex = self.textures.get(texture);
+            let sampler = tex.tex
+                .sampled()
+                .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest)
+                .minify_filter(glium::uniforms::MinifySamplerFilter::Linear);
+
+            surface
+                .draw(
+                    (&self.quad_vertices, instance_buffer.per_instance().unwrap()),
+                    &self.quad_indices,
+                    &self.sprite_shader,
+                    &uniform! {
+                        tex: sampler,
+                        proj: self.camera.proj,
+                        view: self.camera.view,
+                    },
+                    &DrawParameters {
+                        blend: Blend::alpha_blending(),
+                        depth: Depth {
+                            test: DepthTest::IfMoreOrEqual,
+                            write: true,
+                            ..Default::default()
+                        },
                         ..Default::default()
                     },
-                    ..Default::default()
-                },
-            )
-            .expect("draw shouldn't fail");
-        
-        self.draw_count += 1;
+                )
+                .expect("draw shouldn't fail");
+
+            self.draw_count += 1;
+        }
+
+        if use_sbuffer {
+            self.sprite_buffers.push_back(base_instance_buffer);
+        }
     }
 
     pub fn draw_tiles<S>(
@@ -209,8 +238,9 @@ impl System {
                 },
             )
             .expect("draw shouldn't fail");
-            
+
         self.draw_count += 1;
+        self.tile_draw_count += 1;
 
         self.tile_buffers.push_back(tile_buffer);
     }
@@ -250,7 +280,7 @@ impl System {
                 &Default::default(),
             )
             .unwrap();
-            
+
         self.draw_count += 1;
     }
 
@@ -276,6 +306,12 @@ impl System {
 
     fn bind_fxaa_buffer(&self) -> SimpleFrameBuffer {
         SimpleFrameBuffer::new(&self.display, self.fxaa_color_buffer()).unwrap()
+    }
+
+    fn make_sprite_buffer(display: &glium::Display) -> VertexBuffer<SpriteInstance> {
+        VertexBuffer::empty_persistent(display, SPRITE_BUFFER_SIZE).unwrap_or_else(|_| {
+            VertexBuffer::empty_dynamic(display, SPRITE_BUFFER_SIZE).unwrap()
+        })
     }
 
     fn make_tile_buffer(display: &glium::Display) -> VertexBuffer<TileInstance> {
