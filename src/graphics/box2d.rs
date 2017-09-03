@@ -170,14 +170,17 @@ implement_vertex!(DebugVertex, pos, color);
 #[process(draw_physics)]
 pub struct DrawPhysics {
     enabled: bool,
+    draw_aabb: bool,
 }
 
 fn draw_physics(draw: &mut DrawPhysics, data: &mut DataHelper) {
-    if data.services
-        .keyboard
-        .is_pressed(::winit::VirtualKeyCode::F9)
-    {
+    use winit::VirtualKeyCode as VK;
+    if data.services.keyboard.is_pressed(VK::F9) {
         draw.enabled = !draw.enabled;
+    }
+
+    if data.services.keyboard.is_pressed(VK::F10) {
+        draw.draw_aabb = !draw.draw_aabb;
     }
 
     if !draw.enabled {
@@ -189,7 +192,10 @@ fn draw_physics(draw: &mut DrawPhysics, data: &mut DataHelper) {
 
     dd.aabb = data.services.camera.aabb();
 
-    let flags = b2::DRAW_SHAPE | b2::DRAW_JOINT | b2::DRAW_CENTER_OF_MASS;
+    let mut flags = b2::DRAW_SHAPE | b2::DRAW_JOINT | b2::DRAW_CENTER_OF_MASS;
+    if draw.draw_aabb {
+        flags |= b2::DRAW_AABB;
+    }
     p.world.draw_debug_data(dd, flags);
 
     let mut frame = data.services.graphics.current_frame.take().unwrap();
