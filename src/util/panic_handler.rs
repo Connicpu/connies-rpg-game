@@ -65,27 +65,29 @@ fn display_panic(info: &panic::PanicInfo) {
             frame
                 .symbols()
                 .iter()
-                .filter_map(|symbol| match (
-                    symbol.name(),
-                    symbol.filename(),
-                    symbol.lineno(),
-                    symbol.addr(),
-                ) {
-                    (Some(name), Some(file), Some(line), _) => Some(format!(
-                        "fn {}(...)\n    in '{}' at line {}",
-                        name,
-                        trim_path(file),
-                        line
-                    )),
-                    (None, Some(file), Some(line), _) => {
-                        Some(format!("fn in '{}' at line {}", trim_path(file), line))
+                .filter_map(|symbol| {
+                    match (
+                        symbol.name(),
+                        symbol.filename(),
+                        symbol.lineno(),
+                        symbol.addr(),
+                    ) {
+                        (Some(name), Some(file), Some(line), _) => Some(format!(
+                            "fn {}(...)\n    in '{}' at line {}",
+                            name,
+                            trim_path(file),
+                            line
+                        )),
+                        (None, Some(file), Some(line), _) => {
+                            Some(format!("fn in '{}' at line {}", trim_path(file), line))
+                        }
+                        (Some(name), Some(file), None, _) => {
+                            Some(format!("fn {}(...)\n    in '{}'", name, trim_path(file)))
+                        }
+                        (Some(name), None, None, _) => Some(format!("fn {}(...)", name)),
+                        (_, _, _, Some(addr)) => Some(format!("Unresolved symbol {:?}", addr)),
+                        _ => None,
                     }
-                    (Some(name), Some(file), None, _) => {
-                        Some(format!("fn {}(...)\n    in '{}'", name, trim_path(file)))
-                    }
-                    (Some(name), None, None, _) => Some(format!("fn {}(...)", name)),
-                    (_, _, _, Some(addr)) => Some(format!("Unresolved symbol {:?}", addr)),
-                    _ => None,
                 })
                 .collect::<Vec<_>>()
                 .into_iter()

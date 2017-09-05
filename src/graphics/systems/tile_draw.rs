@@ -36,11 +36,15 @@ fn process(_: &mut TileDraw, data: &mut DataHelper) {
         for (x, y) in chunk_range {
             let pos = [x as f32 * 8.0, y as f32 * -8.0, i as f32];
             let chunk = &layer.chunks.chunks[(x + y * map.h_chunks) as usize];
-            data.services
-                .graphics
-                .draw_tile_chunk(&mut frame, pos, layer.tint, chunk, &map.tilesets);
+            data.services.graphics.draw_tile_chunk(
+                &mut frame,
+                pos,
+                layer.tint,
+                chunk,
+                &map.tilesets,
+            );
         }
     }
-    
+
     data.services.graphics.current_frame = Some(frame);
 }
