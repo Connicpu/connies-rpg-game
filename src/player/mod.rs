@@ -7,6 +7,8 @@ use physics::EntityUserData;
 pub mod update;
 pub use player::update::PlayerUpdate;
 
+use timer;
+
 use wrapped2d::b2;
 use wrapped2d::dynamics;
 use wrapped2d::collision;
@@ -19,6 +21,7 @@ pub struct PlayerGroundDetector {
     pub grounded: bool,
     pub contact_count: u32,
     pub player_ground_sensor_entity: Entity,
+    pub last_unground_time_ns: u64,
 }
 
 impl PlayerGroundDetector {
@@ -27,6 +30,7 @@ impl PlayerGroundDetector {
             grounded: false,
             contact_count: 0,
             player_ground_sensor_entity: player_ground_sensor_entity,
+            last_unground_time_ns: 0,
         }
     }
 }
@@ -48,25 +52,28 @@ impl dynamics::world::callbacks::ContactListener<EntityUserData> for PlayerGroun
         &mut self,
         contact: dynamics::world::callbacks::ContactAccess<EntityUserData>,
     ) {
-        //println!("contact begin");
         let mut detector_write = self.detector.write().unwrap();
         if (*contact.fixture_a.user_data() == detector_write.player_ground_sensor_entity) ||
             (*contact.fixture_b.user_data() == detector_write.player_ground_sensor_entity)
         {
             detector_write.contact_count += 1;
             detector_write.grounded = true;
-            //println!("contact_count: {}", detector_write.contact_count);
         }
     }
     fn end_contact(&mut self, contact: dynamics::world::callbacks::ContactAccess<EntityUserData>) {
-        //println!("contact end");
         let mut detector_write = self.detector.write().unwrap();
         if (*contact.fixture_a.user_data() == detector_write.player_ground_sensor_entity) ||
             (*contact.fixture_b.user_data() == detector_write.player_ground_sensor_entity)
         {
             detector_write.contact_count -= 1;
-            detector_write.grounded = detector_write.contact_count > 0;
-            //println!("contact_count: {}", detector_write.contact_count);
+            if detector_write.contact_count > 0 {
+                detector_write.grounded = true;
+            } else {
+                detector_write.grounded = false;
+                timer::UPDATE_TIME.with(|update_time| {
+                    detector_write.last_unground_time_ns = update_time.get().time;
+                });
+            }
         }
     }
     fn pre_solve(

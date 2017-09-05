@@ -22,7 +22,6 @@ impl Layer {
                         ((color & 0x00FF0000) >> 0x10) as f32 / 255.0,
                         ((color & 0x0000FF00) >> 0x08) as f32 / 255.0,
                         ((color & 0x000000FF) >> 0x00) as f32 / 255.0,
-
                         ((color & 0xFF000000) >> 0x18) as f32 / 255.0,
                     ];
                 }

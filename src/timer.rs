@@ -1,6 +1,6 @@
 use time;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Timer {
     pub delta_time: f32,
     pub running_time: f64,
@@ -8,6 +8,13 @@ pub struct Timer {
     pub start_time: u64,
     pub time: u64,
     pub delta_time_ns: u64,
+}
+
+
+use std::cell::Cell;
+
+thread_local! {
+    pub static UPDATE_TIME: Cell<Timer> = Cell::default ();
 }
 
 impl Timer {
@@ -39,6 +46,8 @@ impl Timer {
 
         self.delta_time_ns = diff_time;
         self.time = now;
+
+        UPDATE_TIME.with(|update_time| { update_time.set(*self); });
     }
 
     pub fn immediate_frametime_ns(&self) -> u64 {

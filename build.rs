@@ -15,10 +15,12 @@ fn main() {
             lib_dir.push("msvc");
             dll_dir.push("msvc");
 
-            #[cfg(not(target_feature = "crt-static"))] {
+            #[cfg(not(target_feature = "crt-static"))]
+            {
                 lib_dir.push("md");
             }
-            #[cfg(target_feature = "crt-static")] {
+            #[cfg(target_feature = "crt-static")]
+            {
                 lib_dir.push("mt");
             }
         } else {
@@ -63,9 +65,8 @@ fn main() {
                 let file_name = file_name.to_str().unwrap();
                 if file_name.ends_with(".dll") || file_name.ends_with(".dylib") {
                     new_file_path.push(file_name);
-                    std::fs::copy(&entry_path, new_file_path.as_path()).expect(
-                        "Can't copy from DLL dir",
-                    );
+                    std::fs::copy(&entry_path, new_file_path.as_path())
+                        .expect("Can't copy from DLL dir");
                 }
             }
         }

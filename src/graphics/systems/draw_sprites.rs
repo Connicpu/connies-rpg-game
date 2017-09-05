@@ -52,7 +52,7 @@ fn process(sys: &mut DrawSprites, data: &mut DataHelper) {
         if instances.is_empty() {
             continue;
         }
-        
+
         data.services
             .graphics
             .draw_sprites(&mut frame, instances, tex);
