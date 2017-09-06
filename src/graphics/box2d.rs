@@ -17,6 +17,7 @@ pub struct DebugDraw {
 }
 
 impl DebugDraw {
+    #[allow(redundant_closure)]
     pub fn new(display: &Display) -> Self {
         DebugDraw {
             display: display.clone(),
@@ -164,7 +165,11 @@ struct DebugVertex {
     color: [f32; 3],
 }
 
-implement_vertex!(DebugVertex, pos, color);
+mod debugvertex_impl {
+    #![allow(forget_copy)]
+    use super::DebugVertex;
+    implement_vertex!(DebugVertex, pos, color);
+}
 
 #[derive(Default, System)]
 #[process(draw_physics)]

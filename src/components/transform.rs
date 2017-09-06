@@ -10,6 +10,12 @@ pub struct Transform {
     pub size: Vector2<f32>,
 }
 
+impl Default for Transform {
+    fn default() -> Self {
+        Transform::new()
+    }
+}
+
 impl Transform {
     pub fn new() -> Self {
         Transform {

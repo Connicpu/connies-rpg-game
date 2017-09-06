@@ -12,7 +12,7 @@ pub fn init() {
 fn trim_path(path: &Path) -> String {
     if let Some(component) = path.components()
         .filter_map(|c| c.as_os_str().to_str())
-        .filter(|c| c.starts_with("<"))
+        .filter(|c| c.starts_with('<'))
         .nth(0)
     {
         return component.into();
@@ -58,7 +58,7 @@ fn display_panic(info: &panic::PanicInfo) {
         .frames()
         .iter()
         .flat_map(|frame| {
-            if frame.symbols().len() == 0 {
+            if frame.symbols().is_empty() {
                 return vec![format!("Unresolved symbol {:?}", frame.symbol_address())].into_iter();
             }
 

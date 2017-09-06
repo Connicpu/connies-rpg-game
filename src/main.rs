@@ -1,6 +1,10 @@
 #![feature(inclusive_range_syntax, range_contains)]
 #![feature(get_type_id)]
 #![feature(conservative_impl_trait)]
+#![feature(plugin)]
+#![plugin(clippy)]
+
+#![allow(toplevel_ref_arg)]
 
 extern crate backtrace;
 extern crate cgmath;
@@ -11,6 +15,7 @@ extern crate tiled;
 extern crate time;
 extern crate windows_dpi;
 extern crate wrapped2d;
+extern crate index_pool;
 
 #[macro_use]
 extern crate glium;
@@ -199,6 +204,7 @@ fn load_test_map(world: &mut World, ground_entity: Entity) {
     world.data.services.current_map = Some(map);
 }
 
+#[derive(Copy, Clone)]
 enum Scion {
     Aymeric,
     Papalymo,

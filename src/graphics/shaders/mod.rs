@@ -1,3 +1,5 @@
+#![allow(redundant_closure)]
+
 use glium::{Display, Program};
 
 pub fn load_sprite_shader(display: &Display) -> Program {
