@@ -1,18 +1,18 @@
 use glium::Display;
 use glium::texture::{PixelValue, RawImage2d, SrgbTexture2d, ToClientFormat};
 use image;
+use index_pool::IndexPool;
 
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use util::IdPool;
-
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TextureId(usize);
 
+#[derive(Default)]
 pub struct TextureManager {
-    id_pool: IdPool,
+    id_pool: IndexPool,
     textures: HashMap<TextureId, Texture>,
     name_to_id: HashMap<String, TextureId>,
     id_to_name: HashMap<TextureId, String>,
@@ -20,12 +20,7 @@ pub struct TextureManager {
 
 impl TextureManager {
     pub fn new() -> Self {
-        TextureManager {
-            id_pool: IdPool::new(),
-            textures: HashMap::new(),
-            name_to_id: HashMap::new(),
-            id_to_name: HashMap::new(),
-        }
+        Default::default()
     }
 
     pub fn load(&mut self, display: &Display, asset: &str) -> TextureId {
@@ -49,7 +44,10 @@ impl TextureManager {
     }
 
     pub fn remove(&mut self, id: TextureId) -> Option<Texture> {
-        self.id_pool.return_id(id.0);
+        if self.id_pool.return_id(id.0).is_err() {
+            eprintln!("[WARNING] texture was already removed (or never existed?)");
+        }
+
         if let Some(name) = self.id_to_name.get(&id) {
             self.name_to_id.remove(name);
         }

@@ -4,7 +4,11 @@ pub struct QuadVertex {
     pub uv: [f32; 2],
 }
 
-implement_vertex!(QuadVertex, pos, uv);
+mod quadvertex_impl {
+    #![allow(forget_copy)]
+    use super::QuadVertex;
+    implement_vertex!(QuadVertex, pos, uv);
+}
 
 #[derive(Copy, Clone)]
 pub struct SpriteInstance {
@@ -15,7 +19,11 @@ pub struct SpriteInstance {
     pub world_pos: [f32; 3],
 }
 
-implement_vertex!(SpriteInstance, center, scale, rot, uv_rect, world_pos);
+mod spriteinst_impl {
+    #![allow(forget_copy)]
+    use super::SpriteInstance;
+    implement_vertex!(SpriteInstance, center, scale, rot, uv_rect, world_pos);
+}
 
 #[derive(Copy, Clone, Default)]
 #[repr(C)]
@@ -24,7 +32,11 @@ pub struct Camera {
     pub view: [[f32; 4]; 4],
 }
 
-implement_uniform_block!(Camera, proj, view);
+mod camera_impl {
+    #![allow(forget_copy)]
+    use super::Camera;
+    implement_uniform_block!(Camera, proj, view);
+}
 
 pub static QUAD_VERTICES: [QuadVertex; 4] = [
     QuadVertex {

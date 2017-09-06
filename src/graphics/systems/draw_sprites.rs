@@ -11,7 +11,7 @@ pub struct DrawSprites {
 }
 
 fn process(sys: &mut DrawSprites, data: &mut DataHelper) {
-    let ref mut instances = sys.instance_lists;
+    let instances = &mut sys.instance_lists;
 
     let aabb = data.services.camera.aabb();
     for entity in data.services.graphics.scene_grid.entities(aabb) {

@@ -73,4 +73,8 @@ pub struct TileInstance {
     pub tile_id: u16,
 }
 
-implement_vertex!(TileInstance, tile_id);
+mod tileinstance_impl {
+    #![allow(forget_copy)]
+    use super::TileInstance;
+    implement_vertex!(TileInstance, tile_id);
+}

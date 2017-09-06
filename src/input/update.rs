@@ -13,28 +13,29 @@ fn process(_: &mut UpdateInput, data: &mut ::DataHelper) {
     let mut ev_loop = data.services.graphics.events_loop.take().unwrap();
 
     // Handle input
-    ev_loop.poll_events(|event| match event {
-        winit::Event::WindowEvent { event, .. } => match event {
-            Closed => data.services.quit = true,
+    ev_loop.poll_events(|event| {
+        if let winit::Event::WindowEvent { event, .. } = event {
+            match event {
+                Closed => data.services.quit = true,
 
-            Focused(false) => {
-                println!("Focus lost");
-                data.services.keyboard.focus_lost();
-            }
+                Focused(false) => {
+                    info!("Focus lost");
+                    data.services.keyboard.focus_lost();
+                }
 
-            KeyboardInput { input, .. } => match (input.virtual_keycode, input.state) {
-                (Some(vk), ElementState::Pressed) => {
-                    data.services.keyboard.key_pressed(vk);
-                }
-                (Some(vk), ElementState::Released) => {
-                    data.services.keyboard.key_released(vk);
-                }
+                KeyboardInput { input, .. } => match (input.virtual_keycode, input.state) {
+                    (Some(vk), ElementState::Pressed) => {
+                        data.services.keyboard.key_pressed(vk);
+                    }
+                    (Some(vk), ElementState::Released) => {
+                        data.services.keyboard.key_released(vk);
+                    }
+                    _ => (),
+                },
+
                 _ => (),
-            },
-
-            _ => (),
-        },
-        _ => (),
+            }
+        }
     });
 
     data.services.graphics.events_loop = Some(ev_loop);
