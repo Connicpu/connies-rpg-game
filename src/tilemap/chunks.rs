@@ -97,7 +97,7 @@ impl Chunk {
         for (&tile, (x, y)) in self.tiles.iter().zip(coords) {
             if let Some(tileset_i) = find_tileset(tilesets, u32::from(tile)) {
                 let offset = [x as f32, -y as f32];
-                let ref tileset = tilesets.tileset_descs[tileset_i as usize];
+                let tileset = &tilesets.tileset_descs[tileset_i as usize];
 
                 fixture_for_tile(world, handle, offset, tile, tileset);
             }
@@ -135,7 +135,7 @@ fn fixture_for_tile(
     let (ox, oy) = (offset[0], offset[1]);
 
     if let Some(&tile_i) = tileset.tile_gids.get(&tile) {
-        let ref tile = tileset.tileset.tiles[tile_i as usize];
+        let tile = &tileset.tileset.tiles[tile_i as usize];
         if let Some(ref objectgroup) = tile.objectgroup {
             for object in &objectgroup.objects {
                 use tiled::ObjectShape::*;

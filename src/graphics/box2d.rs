@@ -189,8 +189,8 @@ fn draw_physics(draw: &mut DrawPhysics, data: &mut DataHelper) {
         return;
     }
 
-    let ref mut p = data.services.physics;
-    let ref mut dd = data.services.graphics.debugdraw;
+    let p = &mut data.services.physics;
+    let dd = &mut data.services.graphics.debugdraw;
 
     dd.aabb = data.services.camera.aabb();
 

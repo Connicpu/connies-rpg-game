@@ -4,8 +4,6 @@
 #![feature(plugin)]
 #![plugin(clippy)]
 
-#![allow(toplevel_ref_arg)]
-
 extern crate backtrace;
 extern crate cgmath;
 extern crate fnv;

@@ -38,7 +38,7 @@ const EARLY_JUMP_TOLERANCE_MS: u64 = 100;
 fn process(player_update: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
     for player in players {
         let (c, s) = (&mut data.components, &mut data.services);
-        let ref jump_detector = c.player[player].ground_detector.read().unwrap();
+        let jump_detector = &c.player[player].ground_detector.read().unwrap();
 
         let dt = s.timer.delta_time;
 
