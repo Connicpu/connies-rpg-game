@@ -19,7 +19,7 @@ fn process(_: &mut UpdateInput, data: &mut ::DataHelper) {
                 Closed => data.services.quit = true,
 
                 Focused(false) => {
-                    println!("Focus lost");
+                    info!("Focus lost");
                     data.services.keyboard.focus_lost();
                 }
 

@@ -3,17 +3,25 @@
 #![feature(conservative_impl_trait)]
 #![feature(plugin)]
 #![plugin(clippy)]
+#![deny(clippy, items_after_statements, nonminimal_bool)]
+#![deny(option_map_unwrap_or, option_map_unwrap_or_else)]
+#![deny(single_match_else, used_underscore_binding)]
+#![warn(pub_enum_variant_names, unicode_not_nfc)]
+#![warn(print_stdout)] // Please use log macros instead
 
 extern crate backtrace;
 extern crate cgmath;
 extern crate fnv;
 extern crate image;
+extern crate index_pool;
 extern crate msgbox;
 extern crate tiled;
 extern crate time;
 extern crate windows_dpi;
 extern crate wrapped2d;
-extern crate index_pool;
+
+#[macro_use]
+extern crate log;
 
 #[macro_use]
 extern crate glium;
