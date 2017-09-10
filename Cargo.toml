@@ -24,10 +24,14 @@ windows_dpi = "0.1.4"
 winit = "0.7.5"
 wrapped2d = "0.3.4"
 
+[dependencies.fmod-studio]
+git = "https://github.com/Connicpu/fmod-studio-rs"
+
 [dependencies.conniecs]
 version = "0.1.2"
 
 [dependencies.msgbox]
 git = "https://github.com/bekker/msgbox-rs"
+
 [profile.release]
 debug = 1

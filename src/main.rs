@@ -20,6 +20,8 @@ extern crate time;
 extern crate windows_dpi;
 extern crate wrapped2d;
 
+extern crate fmod_studio;
+
 #[macro_use]
 extern crate log;
 
@@ -46,6 +48,7 @@ use conniecs::Entity;
 
 pub use config::CONFIG;
 
+pub mod audio;
 pub mod components;
 pub mod config;
 pub mod graphics;
@@ -83,6 +86,8 @@ pub struct Services {
 
     pub current_map: Option<tilemap::Map>,
     pub player: Entity,
+
+    pub audio: audio::System,
 }
 
 #[derive(ComponentManager)]
@@ -98,6 +103,8 @@ pub struct Components {
 pub struct Systems {
     pub update_time: timer::UpdateTime,
     pub update_input: input::UpdateInput,
+
+    pub update_audio: audio::AudioUpdate,
 
     pub player_update: EntitySystem<player::PlayerUpdate>,
     pub camera_follow: EntitySystem<systems::CameraFollow>,
