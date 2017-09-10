@@ -27,9 +27,14 @@ fn process(sys: &mut DrawSprites, data: &mut DataHelper) {
         let Sprite {
             sprite,
             center,
-            uv_rect,
+            mut uv_rect,
             layer,
+            flip_x,
         } = sprite;
+
+        if flip_x {
+            uv_rect.swap(0, 2);
+        }
 
         let (sin, cos) = (rot.sin, rot.cos);
 

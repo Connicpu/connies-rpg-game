@@ -288,6 +288,11 @@ impl System {
         self.textures.load(&self.display, asset)
     }
 
+    pub fn load_animation(&mut self, asset: &str) -> () {
+        let _ = asset;
+        // TODO
+    }
+
     fn update_fxaa_buffer(&mut self, dimensions: (u32, u32)) {
         if let Some(ref tex) = self.fxaa_buffer {
             if tex.dimensions() == dimensions {
