@@ -6,6 +6,7 @@ pub struct Sprite {
     pub center: [f32; 2],
     pub uv_rect: [f32; 4],
     pub layer: f32,
+    pub flip_x: bool,
 }
 
 impl Sprite {
@@ -15,6 +16,7 @@ impl Sprite {
             center: [0.5, 0.5],
             uv_rect: [0.0, 0.0, 1.0, 1.0],
             layer: 2.0,
+            flip_x: false,
         }
     }
 }

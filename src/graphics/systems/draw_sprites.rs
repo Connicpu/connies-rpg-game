@@ -11,7 +11,7 @@ pub struct DrawSprites {
 }
 
 fn process(sys: &mut DrawSprites, data: &mut DataHelper) {
-    let ref mut instances = sys.instance_lists;
+    let instances = &mut sys.instance_lists;
 
     let aabb = data.services.camera.aabb();
     for entity in data.services.graphics.scene_grid.entities(aabb) {
@@ -27,9 +27,14 @@ fn process(sys: &mut DrawSprites, data: &mut DataHelper) {
         let Sprite {
             sprite,
             center,
-            uv_rect,
+            mut uv_rect,
             layer,
+            flip_x,
         } = sprite;
+
+        if flip_x {
+            uv_rect.swap(0, 2);
+        }
 
         let (sin, cos) = (rot.sin, rot.cos);
 
@@ -52,7 +57,7 @@ fn process(sys: &mut DrawSprites, data: &mut DataHelper) {
         if instances.is_empty() {
             continue;
         }
-        
+
         data.services
             .graphics
             .draw_sprites(&mut frame, instances, tex);

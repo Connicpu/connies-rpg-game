@@ -24,7 +24,7 @@ fn process(_: &mut EndFrame, data: &mut DataHelper) {
     data.services.graphics.draw_count = 0;
     data.services.graphics.tile_draw_count = 0;
 
-    let min_frametime = 1_000_000_000 / CONFIG.graphics.max_fps as u64;
+    let min_frametime = 1_000_000_000 / u64::from(CONFIG.graphics.max_fps);
     while data.services.timer.immediate_frametime_ns() < min_frametime {
         thread::sleep(time::Duration::new(0, 0));
     }

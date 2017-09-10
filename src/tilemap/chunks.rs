@@ -44,22 +44,23 @@ impl Chunk {
         let mut tilesets = [0; MAX_TILESETS];
         let mut tilesets_h = HashSet::new();
 
-        for i in 0..8 {
-            for j in 0..8 {
-                let x = x + j;
-                let y = y + i;
-                let tile = if x < b.map.width && y < b.map.height {
-                    b.map.layers[layer].tiles[y as usize][x as usize]
-                } else {
-                    0
-                };
+        for (i, itile) in tiles.iter_mut().enumerate() {
+            let j = (i % 8) as u32;
+            let i = (i / 8) as u32;
 
-                tiles[(i * 8 + j) as usize] = tile as u16;
+            let x = x + j;
+            let y = y + i;
+            let tile = if x < b.map.width && y < b.map.height {
+                b.map.layers[layer].tiles[y as usize][x as usize]
+            } else {
+                0
+            };
 
-                if tile != 0 {
-                    if let Some(tileset) = find_tileset(&b.tilesets, tile) {
-                        tilesets_h.insert(tileset);
-                    }
+            *itile = tile as u16;
+
+            if tile != 0 {
+                if let Some(tileset) = find_tileset(&b.tilesets, tile) {
+                    tilesets_h.insert(tileset);
                 }
             }
         }
@@ -95,9 +96,9 @@ impl Chunk {
 
         let coords = (0i32..8).flat_map(|y| (0i32..8).map(move |x| (x, y)));
         for (&tile, (x, y)) in self.tiles.iter().zip(coords) {
-            if let Some(tileset_i) = find_tileset(tilesets, tile as u32) {
+            if let Some(tileset_i) = find_tileset(tilesets, u32::from(tile)) {
                 let offset = [x as f32, -y as f32];
-                let ref tileset = tilesets.tileset_descs[tileset_i as usize];
+                let tileset = &tilesets.tileset_descs[tileset_i as usize];
 
                 fixture_for_tile(world, handle, offset, tile, tileset);
             }
@@ -135,9 +136,9 @@ fn fixture_for_tile(
     let (ox, oy) = (offset[0], offset[1]);
 
     if let Some(&tile_i) = tileset.tile_gids.get(&tile) {
-        let ref tile = tileset.tileset.tiles[tile_i as usize];
+        let tile = &tileset.tileset.tiles[tile_i as usize];
         if let Some(ref objectgroup) = tile.objectgroup {
-            for object in objectgroup.objects.iter() {
+            for object in &objectgroup.objects {
                 use tiled::ObjectShape::*;
                 let (x, y) = (object.x / ts, -object.y / ts);
                 match object.shape {

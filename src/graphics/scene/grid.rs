@@ -53,7 +53,7 @@ impl UniformGrid {
 
         self.grid_squares
             .entry(new_pos)
-            .or_insert_with(|| Default::default())
+            .or_insert_with(Default::default)
             .sprites
             .insert(**entity, entity.__clone());
     }

@@ -17,6 +17,7 @@ pub struct DebugDraw {
 }
 
 impl DebugDraw {
+    #[allow(redundant_closure)]
     pub fn new(display: &Display) -> Self {
         DebugDraw {
             display: display.clone(),
@@ -164,7 +165,11 @@ struct DebugVertex {
     color: [f32; 3],
 }
 
-implement_vertex!(DebugVertex, pos, color);
+mod debugvertex_impl {
+    #![allow(forget_copy)]
+    use super::DebugVertex;
+    implement_vertex!(DebugVertex, pos, color);
+}
 
 #[derive(Default, System)]
 #[process(draw_physics)]
@@ -187,8 +192,8 @@ fn draw_physics(draw: &mut DrawPhysics, data: &mut DataHelper) {
         return;
     }
 
-    let ref mut p = data.services.physics;
-    let ref mut dd = data.services.graphics.debugdraw;
+    let p = &mut data.services.physics;
+    let dd = &mut data.services.graphics.debugdraw;
 
     dd.aabb = data.services.camera.aabb();
 

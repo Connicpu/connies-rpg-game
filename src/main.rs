@@ -1,16 +1,27 @@
 #![feature(inclusive_range_syntax, range_contains)]
 #![feature(get_type_id)]
 #![feature(conservative_impl_trait)]
+#![feature(plugin)]
+#![plugin(clippy)]
+#![warn(items_after_statements, nonminimal_bool)]
+#![warn(option_map_unwrap_or, option_map_unwrap_or_else)]
+#![warn(single_match_else, used_underscore_binding)]
+#![warn(pub_enum_variant_names, unicode_not_nfc)]
+#![warn(print_stdout)] // Please use log macros instead
 
 extern crate backtrace;
 extern crate cgmath;
 extern crate fnv;
 extern crate image;
+extern crate index_pool;
 extern crate msgbox;
 extern crate tiled;
 extern crate time;
 extern crate windows_dpi;
 extern crate wrapped2d;
+
+#[macro_use]
+extern crate log;
 
 #[macro_use]
 extern crate glium;
@@ -157,8 +168,11 @@ fn create_player(
     player_ground_sensor_entity: Entity,
 ) -> Entity {
     world.data.create_entity(|e, c, s| {
-        let mut player_sprite = components::Sprite::new(s.default_texture.unwrap());
+        let texture = s.graphics.load_texture("textures/player.png");
+        //let anim = s.graphics.load_animation("animations/player.toml");
+        let mut player_sprite = components::Sprite::new(texture);
         player_sprite.center = [0.5, 1.0];
+        player_sprite.uv_rect = [0.0, 0.0, 1.0 / 3.0, 1.0];
         let player_body = player::Player::create_physics(
             &mut s.physics,
             [9.0, -247.0],
@@ -169,7 +183,7 @@ fn create_player(
             player_ground_sensor_entity,
         );
         let mut player_transform = components::Transform::new();
-        player_transform.size = cgmath::Vector2::<f32> { x: 0.5, y: 1.25 };
+        player_transform.size = cgmath::Vector2::<f32> { x: 0.75, y: 1.25 };
 
         c.sprite.add(e, player_sprite);
         c.transform.add(e, player_transform);
@@ -199,6 +213,7 @@ fn load_test_map(world: &mut World, ground_entity: Entity) {
     world.data.services.current_map = Some(map);
 }
 
+#[derive(Copy, Clone)]
 enum Scion {
     Aymeric,
     Papalymo,

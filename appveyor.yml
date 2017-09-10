@@ -12,6 +12,7 @@ install:
   - cargo -vV
 
 build_script:
+  - cargo update -p clippy
   - cargo build
 
 test_script:

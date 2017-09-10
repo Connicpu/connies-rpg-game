@@ -44,8 +44,8 @@ impl IntAabb {
         self
     }
 
-    pub fn restricted(self, other: IntAabb) -> Self {
-        *self.clone().restrict(other)
+    pub fn restricted(mut self, other: IntAabb) -> Self {
+        *self.restrict(other)
     }
 
     pub fn restricted_min(mut self, x: i32, y: i32) -> Self {
