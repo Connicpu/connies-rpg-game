@@ -109,13 +109,20 @@ fn process(player_update: &mut PlayerUpdate, players: EntityIter, data: &mut Dat
 
         if !left && !right {
             let sign = body_velocity.x.signum();
+            let vel_positive = sign.is_sign_positive();
             let mut new_force = -sign * decel_force_one_second / DECEL_TIME;
 
-            if ((body_velocity.x + new_force * dt).signum() - sign).abs() < 1e-7 {
+            if (body_velocity.x + new_force * dt).is_sign_positive() != vel_positive {
                 new_force = -body_velocity.x * body_mass / dt;
             }
 
             body.apply_horiz_accel(new_force);
+        }
+
+        if left && !body_velocity.x.is_sign_positive() {
+            c.sprite[player].flip_x = true;
+        } else if right && body_velocity.x.is_sign_positive() {
+            c.sprite[player].flip_x = false;
         }
     }
 }
