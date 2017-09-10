@@ -105,6 +105,15 @@ fn process(player_update: &mut PlayerUpdate, players: EntityIter, data: &mut Dat
             player_update.last_used_jump_press_serial = player_update.jump_press_serial;
             let impulse = (-2.0 * p::GRAVITY.y * JUMP_HEIGHT).sqrt() * body_mass;
             body.apply_vert_impulse(impulse);
+
+            s.audio
+                .studio
+                .get_event("event:/jump")
+                .unwrap()
+                .create_instance()
+                .unwrap()
+                .start()
+                .unwrap();
         }
 
         if !left && !right {
