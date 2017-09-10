@@ -3,7 +3,7 @@
 #![feature(conservative_impl_trait)]
 #![feature(plugin)]
 #![plugin(clippy)]
-#![warn(clippy, items_after_statements, nonminimal_bool)]
+#![warn(items_after_statements, nonminimal_bool)]
 #![warn(option_map_unwrap_or, option_map_unwrap_or_else)]
 #![warn(single_match_else, used_underscore_binding)]
 #![warn(pub_enum_variant_names, unicode_not_nfc)]

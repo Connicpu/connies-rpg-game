@@ -44,22 +44,23 @@ impl Chunk {
         let mut tilesets = [0; MAX_TILESETS];
         let mut tilesets_h = HashSet::new();
 
-        for i in 0..8 {
-            for j in 0..8 {
-                let x = x + j;
-                let y = y + i;
-                let tile = if x < b.map.width && y < b.map.height {
-                    b.map.layers[layer].tiles[y as usize][x as usize]
-                } else {
-                    0
-                };
+        for (i, itile) in tiles.iter_mut().enumerate() {
+            let j = (i % 8) as u32;
+            let i = (i / 8) as u32;
 
-                tiles[(i * 8 + j) as usize] = tile as u16;
+            let x = x + j;
+            let y = y + i;
+            let tile = if x < b.map.width && y < b.map.height {
+                b.map.layers[layer].tiles[y as usize][x as usize]
+            } else {
+                0
+            };
 
-                if tile != 0 {
-                    if let Some(tileset) = find_tileset(&b.tilesets, tile) {
-                        tilesets_h.insert(tileset);
-                    }
+            *itile = tile as u16;
+
+            if tile != 0 {
+                if let Some(tileset) = find_tileset(&b.tilesets, tile) {
+                    tilesets_h.insert(tileset);
                 }
             }
         }
