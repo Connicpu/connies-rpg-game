@@ -1,3 +1,4 @@
+use fmod_studio;
 use winit;
 
 use {DataHelper, EntityIter};
@@ -6,7 +7,7 @@ use physics::ext::BodyExt;
 
 use timer;
 
-#[derive(System)]
+#[derive(Default, System)]
 #[system_type(Entity)]
 #[process(process)]
 #[aspect(all(player, body))]
@@ -14,16 +15,7 @@ pub struct PlayerUpdate {
     pub last_jump_press_ns: u64,
     pub jump_press_serial: u64,
     pub last_used_jump_press_serial: u64,
-}
-
-impl Default for PlayerUpdate {
-    fn default() -> Self {
-        PlayerUpdate {
-            last_jump_press_ns: 0,
-            jump_press_serial: 0,
-            last_used_jump_press_serial: 0,
-        }
-    }
+    pub jump_sound: fmod_studio::Guid,
 }
 
 const ACCEL_TIME: f32 = 0.2;
@@ -36,6 +28,10 @@ const LATE_JUMP_TOLERANCE_MS: u64 = 100;
 const EARLY_JUMP_TOLERANCE_MS: u64 = 100;
 
 fn process(player_update: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
+    if player_update.jump_sound == Default::default() {
+        player_update.jump_sound = data.services.audio.get_id("event:/jump").unwrap();
+    }
+
     for player in players {
         let (c, s) = (&mut data.components, &mut data.services);
         let jump_detector = &c.player[player].ground_detector.read().unwrap();
@@ -106,14 +102,7 @@ fn process(player_update: &mut PlayerUpdate, players: EntityIter, data: &mut Dat
             let impulse = (-2.0 * p::GRAVITY.y * JUMP_HEIGHT).sqrt() * body_mass;
             body.apply_vert_impulse(impulse);
 
-            s.audio
-                .studio
-                .get_event("event:/jump")
-                .unwrap()
-                .create_instance()
-                .unwrap()
-                .start()
-                .unwrap();
+            s.audio.play_oneoff(&player_update.jump_sound);
         }
 
         if !left && !right {

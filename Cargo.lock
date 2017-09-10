@@ -368,7 +368,7 @@ dependencies = [
 [[package]]
 name = "fmod-studio"
 version = "0.1.0"
-source = "git+https://github.com/Connicpu/fmod-studio-rs#81a7a901a8a3ebfc6480be4c2d99c9888173e0bf"
+source = "git+https://github.com/Connicpu/fmod-studio-rs#78d9c29259f4ce4c0b394fa024878d8bd0bdb2d8"
 
 [[package]]
 name = "fnv"
