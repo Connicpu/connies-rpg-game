@@ -1,6 +1,6 @@
 environment:
   matrix:
-  - TARGET: nightly-x86_64-pc-windows-msvc
+  - TARGET: nightly-2017-09-10-x86_64-pc-windows-msvc
 install:
   - git submodule update --init --recursive
   - ps: if (ls -r . -fi "*.rs" | sls "`t") { throw "Found tab character" }
@@ -12,7 +12,6 @@ install:
   - cargo -vV
 
 build_script:
-  - cargo update -p clippy
   - cargo build
 
 test_script:
