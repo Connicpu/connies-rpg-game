@@ -29,7 +29,7 @@ const EARLY_JUMP_TOLERANCE_MS: u64 = 100;
 
 fn process(player_update: &mut PlayerUpdate, players: EntityIter, data: &mut DataHelper) {
     if player_update.jump_sound == Default::default() {
-        player_update.jump_sound = data.services.audio.get_id("event:/jump").unwrap();
+        player_update.jump_sound = data.services.audio.get_id("event:/player/jump").unwrap();
     }
 
     for player in players {
