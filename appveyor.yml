@@ -1,18 +1,17 @@
 environment:
   matrix:
-  - TARGET: nightly-x86_64-pc-windows-msvc
+  - TARGET: x86_64-pc-windows-msvc
+    CHANNEL: nightly-2017-09-10
 install:
   - git submodule update --init --recursive
-  - ps: if (ls -r . -fi "*.rs" | sls "`t") { throw "Found tab character" }
-  - ps: Start-FileDownload "https://static.rust-lang.org/dist/rust-${env:TARGET}.exe" -FileName "rust-install.exe"
-  - ps: .\rust-install.exe /VERYSILENT /NORESTART /DIR="C:\rust" | Out-Null
-  - ps: $env:PATH="$env:PATH;C:\rust\bin"
+  - curl -sSf -o rustup-init.exe https://win.rustup.rs
+  - rustup-init.exe --default-host %TARGERT% --default-toolchain %CHANNEL% -y
+  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
   - ps: $env:BOX2D_INCLUDE_PATH="$(pwd)\lib\include"
   - rustc -vV
   - cargo -vV
 
 build_script:
-  - cargo update -p clippy
   - cargo build
 
 test_script:

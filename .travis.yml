@@ -1,6 +1,6 @@
 language: rust
 rust:
-  - nightly
+  - nightly-2017-09-10
 env:
   - BOX2D_INCLUDE_PATH="$TRAVIS_BUILD_DIR/lib/include"
 
@@ -10,5 +10,4 @@ before_install:
   - sudo apt-get install -y libgtk-3-dev
 
 script:
-  - cargo update -p clippy
   - cargo build
