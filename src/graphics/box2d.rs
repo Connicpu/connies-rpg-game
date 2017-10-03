@@ -100,7 +100,7 @@ impl b2::Draw for DebugDraw {
             y: center.y + radius,
         };
 
-        for i in 1...24i32 {
+        for i in 1..=24i32 {
             let theta = i as f32 / 24.0 * 2.0 * f32::consts::PI;
             let x = center.x + theta.sin() * radius;
             let y = center.y + theta.cos() * radius;
