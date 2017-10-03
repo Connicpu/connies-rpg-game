@@ -1,14 +1,5 @@
-use physics as p;
-
 use conniecs::Entity;
-
-use physics::EntityUserData;
-
-pub mod update;
-pub use player::update::PlayerUpdate;
-
 use timer;
-
 use wrapped2d::b2;
 use wrapped2d::dynamics;
 use wrapped2d::collision;
@@ -16,6 +7,12 @@ use wrapped2d::user_data::UserData;
 
 use std::sync::RwLock;
 use std::sync::Arc;
+
+use physics as p;
+use physics::EntityUserData;
+
+pub mod update;
+pub use player::update::PlayerUpdate;
 
 pub struct PlayerGroundDetector {
     pub grounded: bool,
@@ -42,7 +39,7 @@ pub struct PlayerGroundDetectorCallbacks {
 impl PlayerGroundDetectorCallbacks {
     pub fn new(detector: &Arc<RwLock<PlayerGroundDetector>>) -> Self {
         PlayerGroundDetectorCallbacks {
-            detector: detector.clone(),
+            detector: Arc::clone(detector),
         }
     }
 }
