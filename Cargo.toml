@@ -6,7 +6,7 @@ version = "0.1.0"
 [dependencies]
 backtrace = "0.3.2"
 cgmath = "0.15.0"
-clippy = "0.0.165"
+clippy = "0.0.168"
 conniecs-derive = "0.1.2"
 fnv = "1.0.5"
 glium = "0.17.0"
