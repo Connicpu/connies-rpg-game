@@ -14,7 +14,7 @@ pub struct Timer {
 use std::cell::Cell;
 
 thread_local! {
-    pub static UPDATE_TIME: Cell<Timer> = Cell::default ();
+    pub static UPDATE_TIME: Cell<Timer> = Cell::default();
 }
 
 impl Timer {
